@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cookbook Details - SaveIt</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f97415",
+              "background-light": "#f8f7f5",
+              "background-dark": "#23170f",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#1c130d] dark:text-white transition-colors duration-200 antialiased selection:bg-primary/20 selection:text-primary">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Navigation Bar -->
+<div class="sticky top-0 z-50 flex items-center bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md p-4 pb-2 justify-between transition-colors duration-200">
+<button class="text-[#1c130d] dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h2 class="text-[#1c130d] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center opacity-0 pointer-events-none transition-opacity duration-300" id="scroll-title">Sunday Brunch</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex size-12 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-transparent text-[#1c130d] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[24px]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Header Content -->
+<div class="px-5 pt-2 pb-6">
+<!-- HeadlineText -->
+<h1 class="text-[#1c130d] dark:text-white tracking-tight text-[36px] font-bold leading-[1.1] pb-3">Sunday Brunch</h1>
+<!-- MetaText -->
+<div class="flex items-center gap-2 mb-3">
+<span class="flex items-center justify-center bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px] mr-1">restaurant_menu</span> 12 Recipes
+                </span>
+<p class="text-[#9e6b47] dark:text-[#a08d80] text-sm font-medium leading-normal">Created Oct 12</p>
+</div>
+<!-- BodyText -->
+<p class="text-[#1c130d]/80 dark:text-white/80 text-[17px] font-normal leading-relaxed max-w-md">
+                Best recipes for carb loading and weekend vibes. A collection of sweet and savory treats for lazy mornings.
+            </p>
+</div>
+<!-- Controls / Chips -->
+<div class="sticky top-[68px] z-40 bg-gradient-to-b from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark w-full pb-4 pt-1">
+<div class="flex gap-2.5 px-5 overflow-x-auto no-scrollbar snap-x">
+<button class="snap-start flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#1c130d] dark:bg-white px-4 shadow-sm transition-transform active:scale-95">
+<span class="text-white dark:text-[#1c130d] text-sm font-semibold leading-normal">All</span>
+</button>
+<button class="snap-start flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-white/10 border border-[#e6dbd1] dark:border-white/10 px-4 shadow-sm transition-transform active:scale-95">
+<span class="text-[#1c130d] dark:text-white text-sm font-medium leading-normal">Newest</span>
+</button>
+<button class="snap-start flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-white/10 border border-[#e6dbd1] dark:border-white/10 px-4 shadow-sm transition-transform active:scale-95">
+<span class="text-[#1c130d] dark:text-white text-sm font-medium leading-normal">Video Length</span>
+</button>
+<button class="snap-start flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-white/10 border border-[#e6dbd1] dark:border-white/10 px-4 shadow-sm transition-transform active:scale-95">
+<span class="text-[#1c130d] dark:text-white text-sm font-medium leading-normal">Favorites</span>
+</button>
+<button class="snap-start flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-white/10 border border-[#e6dbd1] dark:border-white/10 px-4 shadow-sm transition-transform active:scale-95">
+<span class="text-[#1c130d] dark:text-white text-sm font-medium leading-normal">Easy</span>
+</button>
+</div>
+</div>
+<!-- Recipe Grid -->
+<div class="px-5 pb-32">
+<div class="grid grid-cols-2 gap-4">
+<!-- Card 1 -->
+<div class="group flex flex-col bg-white dark:bg-white/5 rounded-[1.5rem] p-2 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-lg dark:hover:bg-white/10 cursor-pointer">
+<div class="relative w-full aspect-[4/5] rounded-[1rem] overflow-hidden bg-gray-200">
+<img class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Close up of a delicious spicy pizza with fresh basil leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0Jsg-L05xNxmIs_mgZ1mlqQLP815GvWKtPOmhQH6j4UyfzvM7NuXFzqcWE87ZRi2hbUINhgTuS4YrodkitYPAbKXnZoSKlxvboNlmLanKrYg-Co6fQVl0q-wFqxu566NtEtDdl_uysWwlNd7VjTiZo8_VeYi3kOqCzKoEdRA3--TUVE2QxMCb9QDjCzfeuI-ZtGEgyp1oc2c3DwGY9iW8d-ooWMp2Ox6TKzyphS9PPRttm0rsDYSJubMiKNf5tFf5uhE3aZP4guSM"/>
+<div class="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white text-[18px]">smart_display</span>
+</div>
+<div class="absolute bottom-2 left-2 bg-black/30 backdrop-blur-md rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-white text-[12px] fill-1">timer</span>
+<span class="text-white text-[10px] font-bold tracking-wide">15M</span>
+</div>
+</div>
+<div class="px-1 pt-3 pb-1 flex justify-between items-start gap-2">
+<h3 class="text-[#1c130d] dark:text-white text-[15px] font-bold leading-tight line-clamp-2">Spicy Vodka Pizza</h3>
+<button class="text-[#1c130d]/40 dark:text-white/40 hover:text-primary dark:hover:text-primary mt-0.5 shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group flex flex-col bg-white dark:bg-white/5 rounded-[1.5rem] p-2 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-lg dark:hover:bg-white/10 cursor-pointer">
+<div class="relative w-full aspect-[4/5] rounded-[1rem] overflow-hidden bg-gray-200">
+<img class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Creamy carbonara pasta with black pepper and bacon on a plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTxgupQ10Q98WnQ-v2rdjZM2ykT1YbPh-X6RjpM3mg2FXbDj5lGbzHcsWE6jy9bJH25g3zGcRRXe8WRYwaTIADIen67ePO9HYQrVa_-BT_TIz4i6pY-nJmZt7XMtdqpdNdUIn7C1VkfcxAiZBD4GU9v2Lknf8jFMhCWztyCoW1TUfehsM99GJEs72l7FgwEntoeziKGTP6571QABN9aWkRVZP9rgTSDGFl70O7tY3PLyr4w-mc5SIIz8vzpagETJsJJcbQ7VDQnXSh"/>
+<div class="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white text-[18px]">play_circle</span>
+</div>
+<div class="absolute bottom-2 left-2 bg-black/30 backdrop-blur-md rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-white text-[12px] fill-1">timer</span>
+<span class="text-white text-[10px] font-bold tracking-wide">25M</span>
+</div>
+</div>
+<div class="px-1 pt-3 pb-1 flex justify-between items-start gap-2">
+<h3 class="text-[#1c130d] dark:text-white text-[15px] font-bold leading-tight line-clamp-2">Authentic Carbonara</h3>
+<button class="text-[#1c130d]/40 dark:text-white/40 hover:text-primary dark:hover:text-primary mt-0.5 shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group flex flex-col bg-white dark:bg-white/5 rounded-[1.5rem] p-2 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-lg dark:hover:bg-white/10 cursor-pointer">
+<div class="relative w-full aspect-[4/5] rounded-[1rem] overflow-hidden bg-gray-200">
+<img class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Stack of fluffy pancakes topped with butter and maple syrup" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuEZnbYx_Qfo33vIV3FbMGDftvzvoBQqvwgvWzV8gBVitHCIWylo3mWhSmqhfM_s9u23VdvhOYVTd7fAJhIDavGGWNMqQU9o-pwYJ4WBNnmyfCSoZyieONITlEbKmgIhwDkhylqcIhvwgxMmQVdB_QB2Oip-V0V8aZtaltgI7evNi1JD4df_o2whB3uZ-iZRYel8JDMv7AYDmngimiFSaPW4W6IkX2k3FzfGlPPOQL_pdNvoR6D01_4gxdd113HKJg9x2N0vocWyKP"/>
+<div class="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white text-[18px]">smart_display</span>
+</div>
+<div class="absolute bottom-2 left-2 bg-black/30 backdrop-blur-md rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-white text-[12px] fill-1">timer</span>
+<span class="text-white text-[10px] font-bold tracking-wide">45M</span>
+</div>
+</div>
+<div class="px-1 pt-3 pb-1 flex justify-between items-start gap-2">
+<h3 class="text-[#1c130d] dark:text-white text-[15px] font-bold leading-tight line-clamp-2">Fluffy Pancakes</h3>
+<button class="text-[#1c130d]/40 dark:text-white/40 hover:text-primary dark:hover:text-primary mt-0.5 shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group flex flex-col bg-white dark:bg-white/5 rounded-[1.5rem] p-2 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-lg dark:hover:bg-white/10 cursor-pointer">
+<div class="relative w-full aspect-[4/5] rounded-[1rem] overflow-hidden bg-gray-200">
+<img class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Avocado toast on a rustic wooden board with herbs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkXG7VqXpAUnHIOeowLQHcNnge81QGjlTfosFWVtVI0HYXr4xO-Jw1LVbR_gQDLRY5GZouQDLOrRbVgBAeOqyLWZUUMmTkpS34gTACPGR9B9_H3wIbdoeeWAfIiHbAO2uERtLmSZMG3q9Fjo_HKSolusoUiZN8Gki0UkAwdHsqLs135m5aMsxwcAEoEHDKY6qvovgwS3QZZ2ok7WqnMu_zyQch4kJ2LUsgWyF2q0jerMtVMx-fnqOhwyM1smsu97HWyXhdyeRZ70ZB"/>
+<div class="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white text-[18px]">play_circle</span>
+</div>
+<div class="absolute bottom-2 left-2 bg-black/30 backdrop-blur-md rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-white text-[12px] fill-1">timer</span>
+<span class="text-white text-[10px] font-bold tracking-wide">10M</span>
+</div>
+</div>
+<div class="px-1 pt-3 pb-1 flex justify-between items-start gap-2">
+<h3 class="text-[#1c130d] dark:text-white text-[15px] font-bold leading-tight line-clamp-2">Smashed Avo Toast</h3>
+<button class="text-[#1c130d]/40 dark:text-white/40 hover:text-primary dark:hover:text-primary mt-0.5 shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group flex flex-col bg-white dark:bg-white/5 rounded-[1.5rem] p-2 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-lg dark:hover:bg-white/10 cursor-pointer">
+<div class="relative w-full aspect-[4/5] rounded-[1rem] overflow-hidden bg-gray-200">
+<img class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Eggs benedict with rich yellow hollandaise sauce on a muffin" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9_7NH3Gl7vFEDOx6hqKg4HsIKviNJhwOZ6lUextBTeWDII1ee_SkG4HrHY5GUBHmcVn-MaBE708ggCW7925fSGdgyoEm6wGhMgJN__gLltbfTo6oMpG_xjYHkiNS-Zx4xx30YOOlxZUFixIYbZTAJ2PPiNKo_ubWAUY7zNqaocQU3VdNgbZ-dHcoJYHDAH0xeLRCQjDZ3mjd26RD6xIwyqnd8xM_em79slNjvJpsEed87C4KcV694Ic_vIeRvkLCPpjU1c_9TLs63"/>
+<div class="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white text-[18px]">smart_display</span>
+</div>
+<div class="absolute bottom-2 left-2 bg-black/30 backdrop-blur-md rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-white text-[12px] fill-1">timer</span>
+<span class="text-white text-[10px] font-bold tracking-wide">30M</span>
+</div>
+</div>
+<div class="px-1 pt-3 pb-1 flex justify-between items-start gap-2">
+<h3 class="text-[#1c130d] dark:text-white text-[15px] font-bold leading-tight line-clamp-2">Classic Eggs Benny</h3>
+<button class="text-[#1c130d]/40 dark:text-white/40 hover:text-primary dark:hover:text-primary mt-0.5 shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="group flex flex-col bg-white dark:bg-white/5 rounded-[1.5rem] p-2 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-lg dark:hover:bg-white/10 cursor-pointer">
+<div class="relative w-full aspect-[4/5] rounded-[1rem] overflow-hidden bg-gray-200">
+<img class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Berry sorbet in a glass with fresh mint garnish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6XS5Q2cGQH_wyI5c97MDc7Drt6KoECw1_vR6oQ5bYl13bbPaaEn2GG_D7kiBWdloRbR9EPKqQLng7yk3gpWxKqT2LWA4VrYU2uO3_1DVzdh79IMaZlgAck0CslNgJlLORgFYO1hvDxwn5ZChAF4znUcmnOLrCcjy40_2PZddlClW6I7GZahAdlD5ycSM3jQmwaQZa9hi7rkgRlwOhvq3dtd8lba5ZUAjFbd_7AeC7Bo-Dh-eUXYsuQCkmS_tezR9TJl72Xs7Ec0LS"/>
+<div class="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white text-[18px]">play_circle</span>
+</div>
+<div class="absolute bottom-2 left-2 bg-black/30 backdrop-blur-md rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-white text-[12px] fill-1">timer</span>
+<span class="text-white text-[10px] font-bold tracking-wide">2H</span>
+</div>
+</div>
+<div class="px-1 pt-3 pb-1 flex justify-between items-start gap-2">
+<h3 class="text-[#1c130d] dark:text-white text-[15px] font-bold leading-tight line-clamp-2">Berry Sorbet</h3>
+<button class="text-[#1c130d]/40 dark:text-white/40 hover:text-primary dark:hover:text-primary mt-0.5 shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- FAB -->
+<div class="fixed bottom-8 right-6 z-50">
+<button class="flex items-center justify-center gap-2 h-[56px] bg-primary hover:bg-orange-600 text-white rounded-full pl-5 pr-6 shadow-xl shadow-orange-500/20 transition-all duration-300 active:scale-95 group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform duration-300">add</span>
+<span class="font-bold text-[15px] tracking-wide">Add Recipe</span>
+</button>
+</div>
+</div>
+</body></html>

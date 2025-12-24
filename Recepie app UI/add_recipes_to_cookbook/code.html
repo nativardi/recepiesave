@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add Recipes to Cookbook - SaveIt</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f97415",
+                        "background-light": "#f8f7f5", // Keeping config but overriding body with orange-50 as requested
+                        "background-dark": "#23170f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-orange-50 dark:bg-background-dark font-display antialiased text-gray-900 dark:text-gray-100 min-h-screen relative pb-32">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-20 bg-orange-50/90 dark:bg-background-dark/90 backdrop-blur-md transition-colors duration-200">
+<div class="flex items-center px-4 py-3 justify-between">
+<button class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all text-gray-800 dark:text-gray-200">
+<span class="material-symbols-outlined" style="font-size: 24px;">chevron_left</span>
+</button>
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Add Recipes</h2>
+<button class="flex h-10 items-center justify-end px-2">
+<p class="text-primary text-base font-bold leading-normal tracking-[0.015em] shrink-0">Done</p>
+</button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="px-4 py-2">
+<div class="relative flex items-center w-full h-12 rounded-full shadow-sm bg-white dark:bg-[#2f221a] overflow-hidden border border-orange-100 dark:border-transparent transition-all focus-within:ring-2 focus-within:ring-primary/20">
+<div class="flex items-center justify-center pl-4 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined" style="font-size: 24px;">search</span>
+</div>
+<input class="w-full h-full bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder:text-gray-400 pl-3 pr-4 text-base font-normal leading-normal" placeholder="Search your library..." type="text"/>
+</div>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar mask-gradient-right">
+<!-- Active Chip -->
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary text-white px-5 shadow-sm transition-transform active:scale-95">
+<p class="text-sm font-medium leading-normal">Recent</p>
+</button>
+<!-- Inactive Chips -->
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2f221a] border border-orange-100 dark:border-transparent px-5 transition-transform active:scale-95 hover:bg-orange-50 dark:hover:bg-white/5">
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Breakfast</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2f221a] border border-orange-100 dark:border-transparent px-5 transition-transform active:scale-95 hover:bg-orange-50 dark:hover:bg-white/5">
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Vegan</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2f221a] border border-orange-100 dark:border-transparent px-5 transition-transform active:scale-95 hover:bg-orange-50 dark:hover:bg-white/5">
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Dessert</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#2f221a] border border-orange-100 dark:border-transparent px-5 transition-transform active:scale-95 hover:bg-orange-50 dark:hover:bg-white/5">
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Quick</p>
+</button>
+</div>
+<!-- Section: Recently Added -->
+<div class="pt-2">
+<h3 class="text-gray-900 dark:text-white tracking-tight text-xl font-bold leading-tight px-4 pb-3">Recently Added</h3>
+<div class="flex flex-col gap-3 px-4">
+<!-- Item 1 (Selected) -->
+<label class="group flex items-center justify-between p-3 bg-orange-100/50 dark:bg-primary/10 rounded-2xl border border-primary/20 dark:border-primary/30 transition-all cursor-pointer select-none relative overflow-hidden">
+<div class="flex items-center gap-4 z-10">
+<div class="relative size-16 shrink-0 rounded-xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Close up of spicy rigatoni pasta with vodka sauce" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh2lCs3mMLhbahOcmbiXfa28knVAy1XXBRyymkCCltr89qZu0SqAa_33ZJzMceq4wjwGIQXH-oxr4vkWE_6cBZ0WyEOVu8PygPye7gLCMetOFrZQ_SMTa6E-0RUFA5_nbFWbo5dJbvBi4M00dKda4pU0k5OabZQsDn49JIMgn3DG5HTq8AKwByaeovdP3yeWVtG7z6rAewA-exspDbrW9411wpVLNPGj7wkyKxBMrQNFWSROYx90p7KFvn3svzIbG91jFQcD_v1yEp"/>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">Spicy Rigatoni Vodka</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-red-500" style="font-size: 14px;">videocam</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">Instagram • 20 mins</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 z-10 pl-4">
+<div class="relative flex items-center justify-center">
+<input checked="" class="peer h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 bg-transparent checked:bg-primary checked:border-primary transition-all duration-200 cursor-pointer appearance-none checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[6px] checked:after:w-[5px] checked:after:h-[10px] checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" type="checkbox"/>
+</div>
+</div>
+</label>
+<!-- Item 2 -->
+<label class="group flex items-center justify-between p-3 bg-white dark:bg-[#2f221a] rounded-2xl shadow-sm border border-transparent transition-all cursor-pointer select-none active:scale-[0.99] hover:shadow-md">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0 rounded-xl overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover" data-alt="Fresh green goddess salad in a bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBLqmKuuythnti8fbxSnjHJlpj6LRQ-VwTOzQSz5ES1lwpYeQFUL7q89_PlHCS0-agkmpFE46ECe41bjkv6PSOqQCaDuM7qZmXMoqPSI0_cd_oGPaxyjj1VINO9RFrkwBnQvUqtO3CoTHgnmLPelF8qdZhhO0ZQSlaETG6ckGZjXdB2tRITaiCC-MVfdzFry9SEcPnxvfulxElF3hJjPzK38qRGyh_2LbGcnhFR4i4qfBvhkatQQGfO_KdPUZCUI7jxrNH8fai23qY"/>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">Green Goddess Salad</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-500" style="font-size: 14px;">music_note</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">TikTok • 15 mins</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 pl-4">
+<div class="relative flex items-center justify-center">
+<input class="peer h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 bg-transparent checked:bg-primary checked:border-primary transition-all duration-200 cursor-pointer appearance-none checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[6px] checked:after:w-[5px] checked:after:h-[10px] checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" type="checkbox"/>
+</div>
+</div>
+</label>
+<!-- Item 3 -->
+<label class="group flex items-center justify-between p-3 bg-white dark:bg-[#2f221a] rounded-2xl shadow-sm border border-transparent transition-all cursor-pointer select-none active:scale-[0.99] hover:shadow-md">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0 rounded-xl overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover" data-alt="Overnight oats in a glass jar with berries" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUkgfWoT89hZAbtRXoD8iPcR1mQXr1ZC7KWPxYdU9-qVNvb3nl-R_gtTG1vwnYenqoqTTsLzYuE-bFlo4yIWMvZZK5LsHLFXlKuJDoiKDDnQsneu7hGYc35oCtKbOeBzmuBbkBoh96CzgmhSKBxgkOUdoRg4G_OXLTT-7yI5zM04ld0I0mUhCG34sddhbKiHYrGd8CcfRlMQpw2OHOZAHviHoA6lY4fO-l_aXk7_3pjOJM0KxdBGDrgTOpNME3CgGOflFmZI0weS47"/>
+<div class="absolute inset-0 bg-black/10"></div>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">Berry Overnight Oats</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-blue-500" style="font-size: 14px;">language</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">Web • 5 mins</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 pl-4">
+<div class="relative flex items-center justify-center">
+<input class="peer h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 bg-transparent checked:bg-primary checked:border-primary transition-all duration-200 cursor-pointer appearance-none checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[6px] checked:after:w-[5px] checked:after:h-[10px] checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" type="checkbox"/>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Section: All Recipes -->
+<div class="pt-6">
+<h3 class="text-gray-900 dark:text-white tracking-tight text-xl font-bold leading-tight px-4 pb-3">All Recipes</h3>
+<div class="flex flex-col gap-3 px-4">
+<!-- Item 4 (Selected) -->
+<label class="group flex items-center justify-between p-3 bg-orange-100/50 dark:bg-primary/10 rounded-2xl border border-primary/20 dark:border-primary/30 transition-all cursor-pointer select-none relative overflow-hidden">
+<div class="flex items-center gap-4 z-10">
+<div class="relative size-16 shrink-0 rounded-xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Rustic sourdough bread loaf on wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg-J1BTugFfeh5SE6ZyVibKfSgYYOflarNIdImG9UXdZDsd15sylmWxa29CYEMRzZoHhZeOzujHm63fj9Ch4BnxvDCY5I-R_kfc9QSBoTxLg480etGW5dz58Bv4j2SbJj0ZWVPEoSfyyLERCgaK_d0OU9Ykwlub0vWOgytrZhpOXmJXkYxkgTTjnNU2VGvJHQkE5xJmE2IaKGlOzfaFfbFRXmzhAKMMjmJ-H2h8Hd13mxutZ2Ih6rMztPFmrN0uryQZ53n43Lp75-X"/>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">Artisan Sourdough</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-red-600" style="font-size: 14px;">play_circle</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">YouTube • 24 hrs</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 z-10 pl-4">
+<div class="relative flex items-center justify-center">
+<input checked="" class="peer h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 bg-transparent checked:bg-primary checked:border-primary transition-all duration-200 cursor-pointer appearance-none checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[6px] checked:after:w-[5px] checked:after:h-[10px] checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" type="checkbox"/>
+</div>
+</div>
+</label>
+<!-- Item 5 -->
+<label class="group flex items-center justify-between p-3 bg-white dark:bg-[#2f221a] rounded-2xl shadow-sm border border-transparent transition-all cursor-pointer select-none active:scale-[0.99] hover:shadow-md">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0 rounded-xl overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover" data-alt="Juicy beef burger with cheese and lettuce" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV-LSPwgBGt4qrQH8w7jFO6kBbLncKPn4Gx5pm-P3PhVkEHB4ZVfkdxxcTPDr0OUg5V-_lN-0fp_qOM_ktKA2QjTdGJroO4oYuLQvrxYiU_N2YE3Z5VSzY2NjKQdl1x7z_QhwCkFkkMwydI9P7gmL_IsJLe8G8NYpdwSxxpw_dVGofQbKBVhnIOrT_bAO24AUCYQK9K4l04jc4WYy8dy5Pqc57SF5DSVwz3HKJBiD3HWBOToU7dHStmQTedC_IYpRXdf2LNH_o-nkO"/>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">Smash Burger</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-red-500" style="font-size: 14px;">videocam</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">Instagram • 30 mins</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 pl-4">
+<div class="relative flex items-center justify-center">
+<input class="peer h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 bg-transparent checked:bg-primary checked:border-primary transition-all duration-200 cursor-pointer appearance-none checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[6px] checked:after:w-[5px] checked:after:h-[10px] checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" type="checkbox"/>
+</div>
+</div>
+</label>
+<!-- Item 6 -->
+<label class="group flex items-center justify-between p-3 bg-white dark:bg-[#2f221a] rounded-2xl shadow-sm border border-transparent transition-all cursor-pointer select-none active:scale-[0.99] hover:shadow-md">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0 rounded-xl overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover" data-alt="Slice of chocolate cheesecake on a plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQx4OxWmhsSicpLk4808H_cjg146TWGY3jtBxZM1tqhT3HOqZJjm_vJndyMOC90rGhLYCab0prA-6H6Cn-FHi1BRzMluugq17-JvYBHwHpaWL4t6amDIkVwYfYFXivw_wyGEJgXmqZYlMFn8sTl0NYWH4j8E6_HHLMie9wt43PsKDrbKVrZ_wxJwOyRx9L6W3xqCYN-Tdsoszdc89GdWOeZaAejcc91-L38OSm7RGmaYdXNFJUZRJVO6qYmcNE9KGDBCAgem3nwEdf"/>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">Chocolate Cheesecake</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-500" style="font-size: 14px;">music_note</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">TikTok • 1 hr</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 pl-4">
+<div class="relative flex items-center justify-center">
+<input class="peer h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 bg-transparent checked:bg-primary checked:border-primary transition-all duration-200 cursor-pointer appearance-none checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[6px] checked:after:w-[5px] checked:after:h-[10px] checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" type="checkbox"/>
+</div>
+</div>
+</label>
+<!-- Item 7 -->
+<label class="group flex items-center justify-between p-3 bg-white dark:bg-[#2f221a] rounded-2xl shadow-sm border border-transparent transition-all cursor-pointer select-none active:scale-[0.99] hover:shadow-md">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0 rounded-xl overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover" data-alt="Crispy golden pepperoni pizza" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe2-DRnYeKkzF0PISsNoPiw4FJJxdEoTNosQVqti1QYEZiYqswWd8JUYgYnXl9l8m6zVhckO1OXUTuzasIvbcL6AmwRGQ2_kEVzn_ZXGGZn1uQnMUq9M-s5cMpNCr8K7kWZHpVZk5129u-DxwBhEdO0-jstS1iSwDjWPX3Bf_evClsfVs_gI5gC507-REANAl7eZXf_yfKkvXoYNo6SlkwGFQkJg03A0YiVD5YMEXXaHfLXymdhQMmVa7IK5We6Z30iycbfxlb7110"/>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">NY Style Pizza</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-red-600" style="font-size: 14px;">play_circle</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">YouTube • 40 mins</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 pl-4">
+<div class="relative flex items-center justify-center">
+<input class="peer h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 bg-transparent checked:bg-primary checked:border-primary transition-all duration-200 cursor-pointer appearance-none checked:after:content-[''] checked:after:absolute checked:after:top-[2px] checked:after:left-[6px] checked:after:w-[5px] checked:after:h-[10px] checked:after:border-r-2 checked:after:border-b-2 checked:after:border-white checked:after:rotate-45" type="checkbox"/>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Floating Action Button Area -->
+<div class="fixed bottom-0 left-0 w-full p-4 pb-8 bg-gradient-to-t from-orange-50/95 via-orange-50/80 to-transparent dark:from-background-dark/95 dark:via-background-dark/80 z-30 pointer-events-none">
+<div class="pointer-events-auto max-w-lg mx-auto">
+<button class="w-full group flex items-center justify-between bg-primary hover:bg-orange-600 text-white font-bold h-14 px-2 rounded-full shadow-lg shadow-orange-300/50 dark:shadow-orange-900/20 active:scale-[0.98] transition-all">
+<div class="w-12 h-12 flex items-center justify-center rounded-full bg-white/20 ml-1">
+<span class="text-lg">2</span>
+</div>
+<span class="text-lg tracking-wide">Add Selected Recipes</span>
+<div class="w-12 h-12 flex items-center justify-center mr-1">
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</button>
+</div>
+</div>
+</body></html>

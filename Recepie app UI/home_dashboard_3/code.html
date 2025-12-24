@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SaveIt - Cookbooks Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Lora:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#E07A5F", 
+              "background-light": "#fff7ed", // bg-orange-50
+              "background-dark": "#23170f",
+              "surface-light": "#ffffff", // bg-white
+              "surface-secondary": "#e5e7eb", // bg-gray-200
+              "charcoal": "#3D405B",
+              "cream": "#fff7ed" 
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"],
+              "serif": ["Lora", "serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-orange-50 dark:bg-background-dark font-display text-gray-900 dark:text-cream">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden pb-28">
+<div class="flex items-center bg-orange-50 dark:bg-background-dark px-4 py-4 justify-between sticky top-0 z-10">
+<h2 class="text-gray-900 dark:text-cream text-2xl font-bold font-serif leading-tight">Cookbooks</h2>
+<div class="flex items-center gap-4">
+<button aria-label="Create New Cookbook" class="flex items-center justify-center size-10 rounded-full bg-white dark:bg-charcoal/50 text-red-500 shadow-sm">
+<span class="material-symbols-outlined">add</span>
+</button>
+<img class="size-10 rounded-full shrink-0 border-2 border-white dark:border-charcoal shadow-sm" data-alt="User avatar of Alex" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyFSd-rcUBMT2BU6AyW04sVXSjemeR_pQtLCkeO4LnV57z2wsXUhK7gVm77E0q0W4ffVKgs3wrEdIkXgezrZpqXe2sxZNR7b-Go7CopfEGwrB0m6xmXRxQg2bKN8a9_82kMLY5Av9ky5PG4RyMpQWtvXjPn6fNlfD34vMyH-Z7kytd1KOp0UXy7d0kROdWUimOyDlvsfvo8vZKL2PYLYYdPoFvBPo_TeTm8xrACtQJaZhu7_cV8vVGB7_fo-cQ0qdV-nNP_W9gMORs"/>
+</div>
+</div>
+<main class="flex flex-col gap-6 px-4 pt-2">
+<div class="flex flex-col gap-2">
+<h1 class="text-gray-900 dark:text-cream tracking-tight text-3xl font-bold leading-tight font-serif">Your Collections</h1>
+<p class="text-gray-500 text-base">Organize your saved recipes into custom cookbooks.</p>
+</div>
+<div class="w-full">
+<button class="flex w-full items-center gap-4 rounded-xl bg-white p-4 shadow-sm border border-orange-100 active:scale-[0.98] transition-transform">
+<div class="flex size-12 items-center justify-center rounded-full bg-orange-100 text-primary">
+<span class="material-symbols-outlined">library_add</span>
+</div>
+<div class="flex flex-col items-start text-left">
+<span class="text-lg font-bold text-gray-900 font-serif">Create New Cookbook</span>
+<span class="text-sm text-gray-500">Curate a new collection</span>
+</div>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4 pb-4">
+<div class="group relative flex flex-col gap-3 rounded-xl bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="relative aspect-square w-full overflow-hidden rounded-lg">
+<div class="grid h-full w-full grid-cols-2 grid-rows-2 gap-0.5">
+<div class="bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCKkg7lC-QvT14VLsEAy0QUl9ebt8_Qs7GSKBJgy8LTl0pj1bFhzKPIUUjV0p_dx_Q_nNIr_eNbNtB9BWoAJGXQiosG9asL8ZzIArqVehBDpdsMWyez5Ww9Zi1OfqpBKS0cEKdDxyNo6PoEBJ4luMvJ3MfYo4Xl-H0omaIrCtKO-aaDHVl0cgGbxlaEZ77_oGqqDp_QUxxvTs7iw6uQupY-Cygg42nzhVgcL4Pmpv1D0Wu-qAxIOXocBNTUAbgq79zS2IssnnucRlN2');"></div>
+<div class="bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDK3fxBEblOcsJY16855sDmn26TwXFZv2PyAT6Wd3e9jA8Eh23Vtpb5lKFKITnaFoHCb-QXQyJJq-RXo92UZh24YieOw6FhGtLkXJpesUrxwLEhIJ6gU69KvKyaQY4ulRPJpWpdjmaddxl6axTV0m76T-WwuO4yjrst_8YvwQtR6ZPOJ6CZ-8tPej_UUL8eilDx1l2j6CnoxlH8qJfuA72A_aqmiJVdHQtEcWc66CTdzExh2GUSGRe0i3MvbFYydnMByLWKYsyGaeoj');"></div>
+<div class="bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCB65oG1so_S2QHrBxUuac-XZkb_6s6kfPCSvkzgXz8qN3jZjXToJ8FWLlP8zVhaYcZDIqInv4rkYIXxP61XSfUmbnBEI8A1UVLFY26CRX4CqfHjBB1Fwo0uJiOVd8UJvIsfmQ2nf0Az7EzO8uT7_4NnfFSqqxguuFKWUm6lt6t44OcnO6ePMUK5HoRdrbbi6PUSFf0319UL66sFgA20fnDY6dpGP4foEvoDczFhoU7MssWQMCVWTGyhATFDoYr3gpUSf6DF7iLocF0');"></div>
+<div class="bg-orange-100 flex items-center justify-center text-orange-400 font-bold text-xs">+12</div>
+</div>
+<div class="absolute right-2 top-2 rounded-full bg-white/90 p-1 text-red-500 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="flex flex-col px-1">
+<h3 class="text-base font-bold text-gray-900 font-serif">Favorites</h3>
+<span class="text-sm text-gray-500">15 Recipes</span>
+</div>
+</div>
+<div class="group relative flex flex-col gap-3 rounded-xl bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+<div class="h-full w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD1JcW8qUVv4GY_yDgXbagvesqfz3rc2Wei4WFOTnDMtSuUhgLBqyi23eAzcs82UkAND5nwf7rwFyyKH5liVX1EpkdNXzGEYEol6AHgjV3qtLZKZeV3tgjUTo1mPc-6mO_jYLWp1abhCVDLyZpXLqZuMo4qeA1jZiYi2y9auRkBj86TF12PpJBL4i5KGaygSewREIclbO4O5wLVAuNbZUl7_N9vhnMkGDq28eP_HWHpJRLbisZGPsWdg4Volf-FH_2knYmoFNkswAZ5');"></div>
+</div>
+<div class="flex flex-col px-1">
+<h3 class="text-base font-bold text-gray-900 font-serif">Weeknight Dinners</h3>
+<span class="text-sm text-gray-500">8 Recipes</span>
+</div>
+</div>
+<div class="group relative flex flex-col gap-3 rounded-xl bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+<div class="h-full w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCbnlBRmr4eRqpDqH7uQ7YDuxE6rsPCaoYqo9uvzzlCG0eNDVy76jQhkhh5pyoukDXT-LIjsNLvSgyytfSWrT9K3iziN_OqcOzrVSsayIchnhJH3C5qluScf_LXho2-jXrbO83hALlmEE1fJlZn0FdKMB5tgluHJK6SNqUwPlRDro5AZcpf674TzdWJ1LGcNH_DCLiQBZQGrJ8phYacWfjv4x0ZFt7F4XWYuGJgIPjhrqmpbhTuSF9MEuMd0vxOzDoIYERAqUCFukrE');"></div>
+</div>
+<div class="flex flex-col px-1">
+<h3 class="text-base font-bold text-gray-900 font-serif">Healthy Eats</h3>
+<span class="text-sm text-gray-500">24 Recipes</span>
+</div>
+</div>
+<div class="group relative flex flex-col gap-3 rounded-xl bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+<div class="h-full w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBXLgpwWqfFnUT0bCjrMphhapD7dVJPgnynLOGiwRisbASRVybpZr64H7c_UrN2g2ff7XUufOQoDgMZvP7YdQI1tdtKc6V7tYK1eAft2p1KNf6FlSRdC9J6AEWPn4si4LRxYnTzhuhemECs2ZbUcr1ly55UiKQ3hM8hM-EPWXYZryHMCEV6rVMgVrD7sOsRgibMmKBDtypuQhU8Syb5XK7Py2mR-Pd5XQpw4Zy_1XOlnJfvXYqIa4xGyyPfe93SB_UtFH_NgItlCzI5');"></div>
+</div>
+<div class="flex flex-col px-1">
+<h3 class="text-base font-bold text-gray-900 font-serif">Sweet Treats</h3>
+<span class="text-sm text-gray-500">12 Recipes</span>
+</div>
+</div>
+<div class="group relative flex flex-col gap-3 rounded-xl bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+<div class="h-full w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAXYuc2PK66UWIZtlqsHqnuZkSuFSAGqEK97Yo2wFnuC-e5T_ncbKFMrHTKvCPVoRXg2ETIrKJMAPonIHwf7omG5FJMAGSI-VawSsftM96E5ADmRsKDroT18gwa4cklzwhgRaca7nfch29qPhgGVtxsnBlquiDdu3oh4egdPrR47qIHWujNW2kQi1JCY5GIVsNZ7kWJYbZFu-c1ahOvtZafVSqkeZDTXKXSW00jj3_yvIKGBksozbzUMqxAgK2DJcU13UCao7Liz2-L');"></div>
+</div>
+<div class="flex flex-col px-1">
+<h3 class="text-base font-bold text-gray-900 font-serif">Breakfast Ideas</h3>
+<span class="text-sm text-gray-500">5 Recipes</span>
+</div>
+</div>
+<div class="group relative flex flex-col gap-3 rounded-xl bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+<div class="h-full w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKHHuuPWbLD9cOpL9zovvgx-Dzr_Qnb7m3wHx3ujq9p32ufTLiaTci4nWMY43FVUqkMVa27n9JMHKnUyxcKFjgcPJSnpiDtS8UK7t6UzvwbyQKvYBttszkVE842SCIHp8mFILaJhO3JO6a97TGfVKfeSpmmGLA44WODpDxLZspjCIgoMjixHPnnd1dqH-wSmEKrUPOrL1Mcjqj2eEtfXbTqjJuzchK9C_MRBzahW0CWIIJgi0acMp2P0DLPVApvTpxFhKaLvhVoQkU');"></div>
+</div>
+<div class="flex flex-col px-1">
+<h3 class="text-base font-bold text-gray-900 font-serif">Party Food</h3>
+<span class="text-sm text-gray-500">18 Recipes</span>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 h-24 bg-orange-50/95 dark:bg-charcoal/80 backdrop-blur-lg border-t border-gray-200 dark:border-cream/10 z-20">
+<div class="flex justify-around items-center h-full max-w-lg mx-auto px-4 pb-2">
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-cream/60 hover:text-red-500 transition-colors" href="#">
+<span class="material-symbols-outlined !text-3xl">home</span>
+<span class="text-xs font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-cream/60 hover:text-red-500 transition-colors" href="#">
+<span class="material-symbols-outlined !text-3xl">search</span>
+<span class="text-xs font-medium">Search</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-red-500" href="#">
+<span class="material-symbols-outlined !text-3xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="text-xs font-bold">Cookbooks</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-cream/60 hover:text-red-500 transition-colors" href="#">
+<span class="material-symbols-outlined !text-3xl">person</span>
+<span class="text-xs font-medium">Profile</span>
+</a>
+</div>
+</div>
+</div>
+
+</body></html>

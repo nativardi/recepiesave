@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SaveIt - Processing Recipe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Lora:wght@700&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#E07A5F",
+            "background-light": "#FFF7ED", // orange-50 equivalent for custom usage if needed
+            "background-dark": "#23170f",
+            "charcoal": "#3D405B",
+            "sage-green": "#81B29A",
+            "cream": "#F4F1DE",
+            "stone-200": "#e7e5e4",
+            "orange-600": "#ea580c"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"],
+            "serif": ["Lora", "serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "1.5rem",
+            "xl": "2rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+    .animate-spin-slow {
+      animation: spin 2s linear infinite;
+    }
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-orange-50 dark:bg-background-dark font-display text-charcoal dark:text-cream">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<main class="flex flex-1 flex-col items-center justify-center p-6 text-center">
+<div class="flex flex-col items-center justify-center gap-6">
+<i class="size-14 animate-spin-slow text-orange-600" data-lucide="loader-2"></i>
+<div class="flex flex-col gap-2">
+<h1 class="font-serif text-3xl font-bold text-red-500 dark:text-cream">Sous Chef at Work...</h1>
+<p class="text-gray-500 dark:text-cream/80">Extracting ingredients &amp; instructions...</p>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 p-6">
+<div class="mx-auto w-full max-w-sm">
+<div class="relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-charcoal/50">
+<div class="absolute left-0 top-0 h-full w-3/4 rounded-full bg-orange-600"></div>
+</div>
+</div>
+</div>
+</div>
+<script>
+    lucide.createIcons();
+  </script>
+</body></html>

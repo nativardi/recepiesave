@@ -1,0 +1,29 @@
+/* Description: Global styles and Tailwind directives for SaveIt Recipe Edition */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Material Symbols font import */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+
+@layer base {
+  :root {
+    --background: 255 247 237; /* #fff7ed */
+    --foreground: 61 64 91; /* #3D405B */
+  }
+
+  body {
+    @apply bg-background text-charcoal;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

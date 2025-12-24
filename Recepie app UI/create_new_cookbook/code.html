@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create New Cookbook - SaveIt</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f97415",
+              "background-light": "#fff7ed", // Closest to bg-orange-50
+              "background-dark": "#23170f",
+              "surface-light": "#ffffff",
+              "surface-dark": "#2d231e",
+              "accent-red": "#ef4444", // red-500 equivalent
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center justify-center">
+<div class="relative flex h-full min-h-screen w-full max-w-md flex-col bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden mx-auto">
+<!-- Top App Bar -->
+<header class="flex items-center px-4 pt-6 pb-2 justify-between z-10">
+<button aria-label="Cancel" class="text-gray-800 dark:text-gray-200 flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-2xl">close</span>
+</button>
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">New Cookbook</h2>
+<!-- Spacer to balance the X icon -->
+<div class="size-10"></div>
+</header>
+<!-- Main Content Scroll Area -->
+<div class="flex-1 overflow-y-auto px-4 pb-24">
+<!-- Profile/Cover Header -->
+<div class="flex flex-col items-center pt-6 pb-8">
+<div class="relative group cursor-pointer">
+<div class="bg-center bg-no-repeat bg-cover rounded-full h-32 w-32 shadow-sm border-4 border-white dark:border-surface-dark transition-transform transform group-hover:scale-105 bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden" data-alt="Abstract healthy food ingredients flatlay pattern" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCH5_xgSbI6iQbTKo7qrHU5uJKRyIftwiXp_IYMhnvQiY40wP1tBfkZr4cxLGs3cjhoBtpjuy2gyc1sVMdeVQQgQk08Q4pLBrH93rFEp4mAIKbrt6qYDROCfJlMuOebovEDnXRBG-iBFIdlDl45CvLK0K9J1S2SPorOPbwlg1BDMwQUanxmejzbSkMyv-MkkRrOEB7BJuIf5PDo-h_ZJopPmAHYkkBd-5jSm4aRLRjFdyRPLr4AdbgSVxK7KQGdFhprnfBQREM7MigZ");'>
+<!-- Overlay for "Change Photo" visual cue -->
+<div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-3xl">camera_alt</span>
+</div>
+</div>
+<!-- Plus badge -->
+<div class="absolute bottom-0 right-0 bg-primary text-white rounded-full p-2 border-4 border-background-light dark:border-background-dark flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-xl font-bold">add_a_photo</span>
+</div>
+</div>
+<div class="mt-4 text-center">
+<p class="text-primary font-medium text-sm">Tap to add cover photo</p>
+</div>
+</div>
+<!-- Form Fields -->
+<div class="flex flex-col gap-6">
+<!-- Name Field -->
+<div class="group">
+<label class="block text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 ml-1" for="cookbook-name">Cookbook Name</label>
+<div class="relative">
+<input autofocus="" class="w-full bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white rounded-2xl px-5 py-4 text-lg font-medium placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none shadow-sm transition-all" id="cookbook-name" placeholder="e.g., Sunday Brunch" type="text"/>
+<!-- Optional icon inside input -->
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-accent-red material-symbols-outlined opacity-0 group-focus-within:opacity-100 transition-opacity text-xl">
+                            edit
+                        </span>
+</div>
+</div>
+<!-- Helper Text -->
+<div class="-mt-4 ml-1">
+<p class="text-gray-500 dark:text-gray-400 text-xs">Give your collection a memorable name to find it easily later.</p>
+</div>
+<!-- Description Field -->
+<div>
+<label class="block text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 ml-1" for="cookbook-desc">Description <span class="text-gray-400 font-normal">(Optional)</span></label>
+<textarea class="w-full bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white rounded-2xl px-5 py-4 text-base font-normal placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 border-none shadow-sm min-h-[140px] resize-none transition-all" id="cookbook-desc" placeholder="What kind of recipes are you saving here?"></textarea>
+</div>
+<!-- Privacy/Settings Toggle (Optional enhancement for "Mise en place" feel - organization) -->
+<div class="flex items-center justify-between bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-sm mt-2">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-full text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">lock_open</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-gray-900 dark:text-white">Private Cookbook</span>
+<span class="text-xs text-gray-500">Only you can see this collection</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Sticky Footer Action -->
+<div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark pt-8">
+<button class="w-full bg-primary hover:bg-orange-600 text-white font-bold text-lg h-14 rounded-full shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<span>Create Cookbook</span>
+<span class="material-symbols-outlined">check</span>
+</button>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SaveIt - Digital Cookbook</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        orange: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        },
+                        red: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                        }
+                    },
+                    fontFamily: {
+                        "sans": ["Plus Jakarta Sans", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem", 
+                        "lg": "1.5rem", 
+                        "xl": "2rem", 
+                        "2xl": "2.5rem",
+                        "3xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-orange-50 dark:bg-[#23170f] font-sans text-slate-900 dark:text-white transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden group/design-root">
+<header class="flex w-full items-center justify-center pt-8 pb-4 px-4 z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-orange-600" style="font-size: 28px;">skillet</span>
+<h1 class="text-orange-600 tracking-tight text-3xl font-serif font-bold leading-none">SaveIt</h1>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-start px-4 w-full max-w-md mx-auto relative pb-24">
+<div class="w-full mt-4 mb-8 relative">
+<div class="aspect-[4/5] w-full bg-white dark:bg-[#2d2016] rounded-3xl shadow-sm overflow-hidden border border-orange-100 dark:border-white/5 relative p-4 flex flex-col">
+<div class="w-full h-full rounded-2xl bg-orange-50/50 dark:bg-white/5 overflow-hidden relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-90" data-alt="Top down view of organized fresh ingredients on a clean kitchen table mise en place style" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC_HHxwlbd57L0voOjtpDtcfiO_4S0lFuJYCNY6-CMsJRjTbk2OMskGoOvXw85rR8X99DDVH2OG1r4QSi3Pp_Wz3DZjUobavdbUEEKAmOKhHKYEnyV3c8rXPjusjZXETsAmzGH_SV5aio1tfC0en7q7MwXPUkMqP3g6sumBQhWNB4pGdtiflrptmmg9dEWrlv9SQ-XNqGYUlkR8ky4wnOWCVdt4Xvzjta3oXLPcjbG91lKmztNoNgWiH-gUOJLVVfaEYvbrBbTx6iS1");'>
+</div>
+<div class="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-[#2d2016]/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-white/20 transform translate-y-2">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-gray-200 shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Food salad bowl thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPtlB5q5Aw68zERJA1V4kgohSgWoZIrnrPa1xSU_r48W9C5OCl6oMEDRJEjYmOVSj4qPeuQP3vlSRvlkLRGThulnQOL9Qv-YQ-a2AxpQYeNsMKMjxBZefma-D6Q3dGf_I86dWCBLjpgLoohK5pqxMofMNhnxf08Bo8VBi595PS6XFt4XyBqBuoo-qH26xB9PSzqZUjN0b9d3eq1MPCkYjZJN4fH-QtS2LRFT34fbNUvtZ2cySq0e_5ppTyLagCD7zSNQWMrS19BGUz"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="h-3 w-3/4 bg-gray-200 dark:bg-white/20 rounded-full mb-1.5"></div>
+<div class="h-2 w-1/2 bg-gray-100 dark:bg-white/10 rounded-full"></div>
+</div>
+<div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="h-2 w-full bg-gray-100 dark:bg-white/10 rounded-full"></div>
+<div class="h-2 w-5/6 bg-gray-100 dark:bg-white/10 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center gap-6 mb-6 opacity-70 grayscale transition-all hover:grayscale-0">
+<div class="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="text-[#E1306C] material-symbols-outlined" style="font-size: 20px;">photo_camera</span>
+<span>Instagram</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="text-black dark:text-white material-symbols-outlined" style="font-size: 20px;">music_note</span>
+<span>TikTok</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+<span class="text-[#FF0000] material-symbols-outlined" style="font-size: 20px;">play_circle</span>
+<span>YouTube</span>
+</div>
+</div>
+<div class="flex flex-col items-center text-center max-w-xs mx-auto space-y-4">
+<h2 class="text-slate-900 dark:text-white tracking-tight text-[36px] font-serif font-bold leading-[1.1]">
+                    Turn Viral Videos into <span class="text-orange-600">Real Meals</span>
+</h2>
+<p class="text-slate-600 dark:text-slate-300 text-base font-sans font-medium leading-relaxed px-2">
+                    Stop taking screenshots. SaveIt automatically extracts ingredients and instructions from your favorite cooking videos.
+                </p>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 w-full bg-gradient-to-t from-orange-50 via-orange-50 to-transparent dark:from-[#23170f] dark:via-[#23170f] pt-12 pb-8 px-6 z-20 pointer-events-none flex justify-center">
+<div class="w-full max-w-md flex flex-col gap-4 pointer-events-auto">
+<button class="w-full bg-orange-600 hover:bg-orange-700 active:scale-95 transition-all text-white font-bold text-lg py-4 rounded-full shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 font-sans">
+<span>Start Cooking - Free</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<div class="text-center font-sans">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Already have an account?</span>
+<a class="text-red-500 hover:text-red-600 font-bold text-sm ml-1" href="#">Log in</a>
+</div>
+<div class="h-1 w-full"></div>
+</div>
+</div>
+</div>
+</body></html>

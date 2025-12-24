@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recipe Detail View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+      }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#ea580c", // Orange-600
+              "background-light": "#fff7ed", // Orange-50
+              "background-dark": "#23170f",
+              "surface": "#ffffff", // White
+              "text-primary": "#3C3633", // Dark Charcoal
+              "text-accent": "#ef4444", // Red-500
+              "text-muted": "#6b7280", // Gray-500
+              "secondary": "#e5e7eb", // Gray-200
+              "chip-bg": "#ffffff", // White for inactive tabs container
+              "active-tab-bg": "#fff7ed", // Orange-50 for active tab
+            },
+            fontFamily: {
+              "display": ["Lato", "sans-serif"],
+              "heading": ["Playfair Display", "serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-primary dark:text-background-light">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4 justify-between">
+<button class="flex items-center justify-center rounded-full h-12 w-12 text-text-primary dark:text-background-light hover:bg-black/5">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center rounded-full h-12 w-12 text-text-primary dark:text-background-light hover:bg-black/5">
+<span class="material-symbols-outlined">bookmark_border</span>
+</button>
+<button class="flex items-center justify-center rounded-full h-12 w-12 text-text-primary dark:text-background-light hover:bg-black/5">
+<span class="material-symbols-outlined">ios_share</span>
+</button>
+</div>
+</div>
+<div class="relative @container px-4">
+<div class="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden rounded-xl min-h-[30vh]" data-alt="A finished plate of spicy tomato and basil pasta, beautifully garnished." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4ZRk4u4xFaEIXtH1wlKHrZvt__SI0YYTgmf7r9GJKHdEDicD4gEa5AaSMb2zaG2TxoFzqens1ZLXryQB98eynAEnhg1ymfZf4Ohkj9nfVwgDU3VK9jUU2lBIrUeylFmLLF0K92vdWFBZ87iS_dCVd32bYbRVAy-WrGfBBwYOvjmMBEf1dGbOF3MReAY-5iC5NLSDLIAgNYTnVWJMa4UxrEPM3NrfbBmtH0qCnURC6SDOiFC71CcUosd1_oa0tAtta0jcQiGz1-rxB");'></div>
+<div class="absolute bottom-4 right-8">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 w-14 bg-white/90 backdrop-blur text-primary shadow-lg">
+<span class="material-symbols-outlined text-3xl">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="px-4">
+<h1 class="text-text-primary dark:text-background-light tracking-tight text-4xl font-heading font-bold leading-tight pt-6 pb-4">Spicy Tomato &amp; Basil Pasta</h1>
+<div class="flex gap-2 pb-6 overflow-x-auto">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-secondary px-4">
+<p class="text-text-primary text-sm font-medium leading-normal">Prep: 15 min</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-secondary px-4">
+<p class="text-text-primary text-sm font-medium leading-normal">Cook: 20 min</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-secondary px-4">
+<p class="text-text-primary text-sm font-medium leading-normal">Serves: 4</p>
+</div>
+</div>
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 bg-primary text-white text-base font-bold leading-normal tracking-wide shadow-md">
+                Start Cooking
+            </button>
+</div>
+<div class="px-4 py-6">
+<div class="flex w-full rounded-full bg-white p-1 shadow-sm">
+<button class="flex-1 rounded-full bg-active-tab-bg shadow-sm py-2.5 text-center text-sm font-bold text-text-primary dark:text-background-light">Ingredients</button>
+<button class="flex-1 rounded-full py-2.5 text-center text-sm font-medium text-text-muted hover:bg-gray-50">Instructions</button>
+</div>
+</div>
+<div class="px-4 pb-8 space-y-4">
+<div class="flex items-center gap-4 rounded-lg p-3 bg-surface shadow-sm">
+<div class="flex h-6 w-6 items-center justify-center rounded-md border-2 border-primary bg-primary text-white">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<p class="flex-1 text-base text-text-primary dark:text-background-light">
+<span class="font-bold text-text-accent">400g</span> Canned Tomatoes
+                </p>
+</div>
+<div class="flex items-center gap-4 rounded-lg p-3 bg-surface shadow-sm">
+<div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-secondary hover:border-primary cursor-pointer"></div>
+<p class="flex-1 text-base text-text-primary dark:text-background-light">
+<span class="font-bold text-text-accent">1 cup</span> Fresh Basil
+                </p>
+</div>
+<div class="flex items-center gap-4 rounded-lg p-3 bg-surface shadow-sm">
+<div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-secondary hover:border-primary cursor-pointer"></div>
+<p class="flex-1 text-base text-text-primary dark:text-background-light">
+<span class="font-bold text-text-accent">2 cloves</span> Garlic, minced
+                </p>
+</div>
+<div class="flex items-center gap-4 rounded-lg p-3 bg-surface shadow-sm">
+<div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-secondary hover:border-primary cursor-pointer"></div>
+<p class="flex-1 text-base text-text-primary dark:text-background-light">
+<span class="font-bold text-text-accent">1 tsp</span> Red Pepper Flakes
+                </p>
+</div>
+<div class="flex items-center gap-4 rounded-lg p-3 bg-surface shadow-sm">
+<div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-secondary hover:border-primary cursor-pointer"></div>
+<p class="flex-1 text-base text-text-primary dark:text-background-light">
+<span class="font-bold text-text-accent">3 tbsp</span> Olive Oil
+                </p>
+</div>
+<div class="flex items-center gap-4 rounded-lg p-3 bg-surface shadow-sm">
+<div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-secondary hover:border-primary cursor-pointer"></div>
+<p class="flex-1 text-base text-text-primary dark:text-background-light">
+<span class="font-bold text-text-accent">350g</span> Pasta (your choice)
+                </p>
+</div>
+</div>
+</div>
+</body></html>

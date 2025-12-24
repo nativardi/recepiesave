@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SaveIt - Home Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Lora:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#E07A5F", // Orange-600 equivalent kept as requested
+              "background-light": "#fff7ed", // orange-50
+              "background-dark": "#23170f",
+              "surface-light": "#ffffff", // white
+              "charcoal": "#3D405B",
+              "cream": "#fff7ed" 
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"],
+              "serif": ["Lora", "serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-orange-50 dark:bg-background-dark font-display text-gray-900 dark:text-cream">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden pb-28">
+<div class="flex items-center bg-orange-50 dark:bg-background-dark p-4 justify-between sticky top-0 z-10">
+<h2 class="text-gray-900 dark:text-cream text-2xl font-bold font-serif leading-tight">SaveIt</h2>
+<img class="size-10 rounded-full shrink-0" data-alt="User avatar of Alex" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyFSd-rcUBMT2BU6AyW04sVXSjemeR_pQtLCkeO4LnV57z2wsXUhK7gVm77E0q0W4ffVKgs3wrEdIkXgezrZpqXe2sxZNR7b-Go7CopfEGwrB0m6xmXRxQg2bKN8a9_82kMLY5Av9ky5PG4RyMpQWtvXjPn6fNlfD34vMyH-Z7kytd1KOp0UXy7d0kROdWUimOyDlvsfvo8vZKL2PYLYYdPoFvBPo_TeTm8xrACtQJaZhu7_cV8vVGB7_fo-cQ0qdV-nNP_W9gMORs"/>
+</div>
+<main class="flex flex-col gap-6">
+<div class="px-4">
+<h1 class="text-gray-900 dark:text-cream tracking-tight text-4xl font-bold leading-tight font-serif pt-2 pb-4">Hello, Alex!</h1>
+<div class="flex max-w-full flex-wrap items-end">
+<label class="flex flex-col min-w-40 flex-1">
+<div class="flex w-full flex-1 items-stretch rounded-lg shadow-sm">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-cream focus:outline-0 focus:ring-0 border-none bg-white dark:bg-charcoal/50 h-14 placeholder:text-gray-500 dark:placeholder:text-cream/50 p-4 rounded-r-none border-r-0 text-base font-normal leading-normal" placeholder="Paste a recipe link..." value=""/>
+<button aria-label="Save recipe link" class="text-white flex border-none bg-primary items-center justify-center px-4 rounded-r-lg border-l-0">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+</label>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center px-4 pb-2 pt-4">
+<h3 class="text-gray-900 dark:text-cream text-xl font-bold leading-tight tracking-[-0.015em] font-serif">Recent Saves</h3>
+<a class="text-red-500 text-sm font-medium" href="#">See All</a>
+</div>
+<div class="flex overflow-x-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+<div class="flex items-stretch px-4 gap-4">
+<div class="flex h-full w-40 shrink-0 flex-col gap-2 rounded-lg bg-white dark:bg-charcoal/20 p-2 shadow-sm">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="A close-up shot of spicy rigatoni pasta in a bowl." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCKkg7lC-QvT14VLsEAy0QUl9ebt8_Qs7GSKBJgy8LTl0pj1bFhzKPIUUjV0p_dx_Q_nNIr_eNbNtB9BWoAJGXQiosG9asL8ZzIArqVehBDpdsMWyez5Ww9Zi1OfqpBKS0cEKdDxyNo6PoEBJ4luMvJ3MfYo4Xl-H0omaIrCtKO-aaDHVl0cgGbxlaEZ77_oGqqDp_QUxxvTs7iw6uQupY-Cygg42nzhVgcL4Pmpv1D0Wu-qAxIOXocBNTUAbgq79zS2IssnnucRlN2");'></div>
+<div>
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal truncate">Spicy Rigatoni</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">From TikTok</p>
+</div>
+</div>
+<div class="flex h-full w-40 shrink-0 flex-col gap-2 rounded-lg bg-white dark:bg-charcoal/20 p-2 shadow-sm">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="A golden brown roasted chicken with herbs." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDK3fxBEblOcsJY16855sDmn26TwXFZv2PyAT6Wd3e9jA8Eh23Vtpb5lKFKITnaFoHCb-QXQyJJq-RXo92UZh24YieOw6FhGtLkXJpesUrxwLEhIJ6gU69KvKyaQY4ulRPJpWpdjmaddxl6axTV0m76T-WwuO4yjrst_8YvwQtR6ZPOJ6CZ-8tPej_UUL8eilDx1l2j6CnoxlH8qJfuA72A_aqmiJVdHQtEcWc66CTdzExh2GUSGRe0i3MvbFYydnMByLWKYsyGaeoj");'></div>
+<div>
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal truncate">Lemon Herb Chicken</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">From Instagram</p>
+</div>
+</div>
+<div class="flex h-full w-40 shrink-0 flex-col gap-2 rounded-lg bg-white dark:bg-charcoal/20 p-2 shadow-sm">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="A decadent chocolate lava cake with powdered sugar." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB65oG1so_S2QHrBxUuac-XZkb_6s6kfPCSvkzgXz8qN3jZjXToJ8FWLlP8zVhaYcZDIqInv4rkYIXxP61XSfUmbnBEI8A1UVLFY26CRX4CqfHjBB1Fwo0uJiOVd8UJvIsfmQ2nf0Az7EzO8uT7_4NnfFSqqxguuFKWUm6lt6t44OcnO6ePMUK5HoRdrbbi6PUSFf0319UL66sFgA20fnDY6dpGP4foEvoDczFhoU7MssWQMCVWTGyhATFDoYr3gpUSf6DF7iLocF0");'></div>
+<div>
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal truncate">Chocolate Lava Cake</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">From YouTube</p>
+</div>
+</div>
+<div class="flex h-full w-40 shrink-0 flex-col gap-2 rounded-lg bg-white dark:bg-charcoal/20 p-2 shadow-sm">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="A vibrant salad with quinoa and avocado slices." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAwMwLbiCCL7Hi-vgZ9UuneVGxarnOmYE0dv66XyjtjZrs6NAW-M2s5rTHPm3e_5fe0Gxoh5AhRYlB1kjNRyf6v5yTi0S4e-WtSBEBuCtQgPuCpeBLNdI3hmbD37Wq5XJQGbalBQKctV5mJEEbev-F4sZlYZwcsO-X8mvNt6ZFppZ3AlvrnF5hQ4cM7yGecbcPLJRgu0MZNRmn3PCsp1WbEkWd0bG8VQMs03r_4i-xhmqX39j7r0zc_p3C4ehCbZg-qHWWJtEQ4fwUH");'></div>
+<div>
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal truncate">Quinoa Avocado Salad</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">From TikTok</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h3 class="text-gray-900 dark:text-cream text-xl font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-4 font-serif">Your Library</h3>
+<div class="px-4 grid grid-cols-2 gap-4" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-2 bg-white dark:bg-charcoal/20 p-2 rounded-lg shadow-sm">
+<img class="w-full rounded-lg aspect-[3/4] object-cover" data-alt="A delicious-looking pizza with fresh basil and mozzarella." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1JcW8qUVv4GY_yDgXbagvesqfz3rc2Wei4WFOTnDMtSuUhgLBqyi23eAzcs82UkAND5nwf7rwFyyKH5liVX1EpkdNXzGEYEol6AHgjV3qtLZKZeV3tgjUTo1mPc-6mO_jYLWp1abhCVDLyZpXLqZuMo4qeA1jZiYi2y9auRkBj86TF12PpJBL4i5KGaygSewREIclbO4O5wLVAuNbZUl7_N9vhnMkGDq28eP_HWHpJRLbisZGPsWdg4Volf-FH_2knYmoFNkswAZ5"/>
+<div class="px-1 pb-1">
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal">Margherita Pizza</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">30 min</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 bg-white dark:bg-charcoal/20 p-2 rounded-lg shadow-sm">
+<img class="w-full rounded-lg aspect-[4/3] object-cover" data-alt="A stack of fluffy pancakes with syrup and berries." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXYuc2PK66UWIZtlqsHqnuZkSuFSAGqEK97Yo2wFnuC-e5T_ncbKFMrHTKvCPVoRXg2ETIrKJMAPonIHwf7omG5FJMAGSI-VawSsftM96E5ADmRsKDroT18gwa4cklzwhgRaca7nfch29qPhgGVtxsnBlquiDdu3oh4egdPrR47qIHWujNW2kQi1JCY5GIVsNZ7kWJYbZFu-c1ahOvtZafVSqkeZDTXKXSW00jj3_yvIKGBksozbzUMqxAgK2DJcU13UCao7Liz2-L"/>
+<div class="px-1 pb-1">
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal">Fluffy Pancakes</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">20 min</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 bg-white dark:bg-charcoal/20 p-2 rounded-lg shadow-sm">
+<img class="w-full rounded-lg aspect-[3/4] object-cover" data-alt="A healthy and colorful summer salad in a white bowl." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbnlBRmr4eRqpDqH7uQ7YDuxE6rsPCaoYqo9uvzzlCG0eNDVy76jQhkhh5pyoukDXT-LIjsNLvSgyytfSWrT9K3iziN_OqcOzrVSsayIchnhJH3C5qluScf_LXho2-jXrbO83hALlmEE1fJlZn0FdKMB5tgluHJK6SNqUwPlRDro5AZcpf674TzdWJ1LGcNH_DCLiQBZQGrJ8phYacWfjv4x0ZFt7F4XWYuGJgIPjhrqmpbhTuSF9MEuMd0vxOzDoIYERAqUCFukrE"/>
+<div class="px-1 pb-1">
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal">Summer Salad</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">15 min</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-2 bg-white dark:bg-charcoal/20 p-2 rounded-lg shadow-sm">
+<img class="w-full rounded-lg aspect-[4/3] object-cover" data-alt="Avocado toast with a poached egg on top." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKHHuuPWbLD9cOpL9zovvgx-Dzr_Qnb7m3wHx3ujq9p32ufTLiaTci4nWMY43FVUqkMVa27n9JMHKnUyxcKFjgcPJSnpiDtS8UK7t6UzvwbyQKvYBttszkVE842SCIHp8mFILaJhO3JO6a97TGfVKfeSpmmGLA44WODpDxLZspjCIgoMjixHPnnd1dqH-wSmEKrUPOrL1Mcjqj2eEtfXbTqjJuzchK9C_MRBzahW0CWIIJgi0acMp2P0DLPVApvTpxFhKaLvhVoQkU"/>
+<div class="px-1 pb-1">
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal">Avocado Toast</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">10 min</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 bg-white dark:bg-charcoal/20 p-2 rounded-lg shadow-sm">
+<img class="w-full rounded-lg aspect-[3/4] object-cover" data-alt="A bowl of pasta with pesto and cherry tomatoes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBxlyHrNvskYbAb0igsz_TMsqwOgwHUGYImfVKQMY3pA4zW0_2BpvMcv_LiA7h6jE9kAtVtJUknLoPgUHxx7Ze55U2rNEG_PCmipAQ0K-5G6nnYiKXI-KG0QBDe5O1Vx4pWFUX71UUewtVmQuGotbu_q5FHgQVy89NR-sgf3XQnBP7vn5R6wSz1yak7Rf7t5woejmqteXQuWxTN8BQjRh9yVSE9JgthupllWVIVcly26oEdsTHk8aC3zh8_ZSnzOK8uPdxI9swcfhD"/>
+<div class="px-1 pb-1">
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal">Pesto Pasta</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">25 min</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 bg-white dark:bg-charcoal/20 p-2 rounded-lg shadow-sm">
+<img class="w-full rounded-lg aspect-[4/3] object-cover" data-alt="Three scoops of ice cream in a bowl." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXLgpwWqfFnUT0bCjrMphhapD7dVJPgnynLOGiwRisbASRVybpZr64H7c_UrN2g2ff7XUufOQoDgMZvP7YdQI1tdtKc6V7tYK1eAft2p1KNf6FlSRdC9J6AEWPn4si4LRxYnTzhuhemECs2ZbUcr1ly55UiKQ3hM8hM-EPWXYZryHMCEV6rVMgVrD7sOsRgibMmKBDtypuQhU8Syb5XK7Py2mR-Pd5XQpw4Zy_1XOlnJfvXYqIa4xGyyPfe93SB_UtFH_NgItlCzI5"/>
+<div class="px-1 pb-1">
+<p class="text-gray-900 dark:text-cream text-base font-medium leading-normal">Trio of Ice Cream</p>
+<p class="text-gray-500 dark:text-cream/70 text-sm font-normal leading-normal">5 min</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 h-24 bg-orange-50/95 dark:bg-charcoal/80 backdrop-blur-lg border-t border-gray-200 dark:border-cream/10">
+<div class="flex justify-around items-center h-full max-w-lg mx-auto px-4">
+<a class="flex flex-col items-center gap-1 text-red-500" href="#">
+<span class="material-symbols-outlined !text-3xl" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-xs font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-cream/60" href="#">
+<span class="material-symbols-outlined !text-3xl">search</span>
+<span class="text-xs font-medium">Search</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-cream/60" href="#">
+<span class="material-symbols-outlined !text-3xl">favorite</span>
+<span class="text-xs font-medium">Favorites</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-500 dark:text-cream/60" href="#">
+<span class="material-symbols-outlined !text-3xl">person</span>
+<span class="text-xs font-medium">Profile</span>
+</a>
+</div>
+</div>
+</div>
+</body></html>

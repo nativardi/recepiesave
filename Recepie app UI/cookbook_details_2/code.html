@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Profile - SaveIt</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "canvas": "#fff7ed", // orange-50
+              "surface": "#ffffff",
+              "accent": "#ef4444", // red-500
+              "accent-hover": "#dc2626", // red-600
+              "primary-text": "#1c1917", // warm dark grey
+              "secondary-text": "#78716c", // warm grey
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {
+              "lg": "1rem",
+              "xl": "1.5rem",
+              "2xl": "2rem",
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            min-height: 100vh;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-orange-50 font-display text-primary-text antialiased selection:bg-red-100 selection:text-red-500">
+<div class="relative mx-auto flex h-full min-h-screen w-full max-w-md flex-col overflow-x-hidden bg-orange-50">
+<div class="sticky top-0 z-50 flex items-center justify-between bg-orange-50/90 p-4 backdrop-blur-md">
+<button class="flex size-10 items-center justify-center rounded-full text-primary-text hover:bg-black/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-base font-semibold">My Profile</h2>
+<button class="flex size-10 items-center justify-center rounded-full text-primary-text hover:bg-black/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="flex flex-col items-center px-6 pt-2 pb-8 text-center">
+<div class="relative mb-4">
+<div class="h-28 w-28 overflow-hidden rounded-full border-4 border-white shadow-sm ring-1 ring-orange-100">
+<img alt="User Avatar" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9_7NH3Gl7vFEDOx6hqKg4HsIKviNJhwOZ6lUextBTeWDII1ee_SkG4HrHY5GUBHmcVn-MaBE708ggCW7925fSGdgyoEm6wGhMgJN__gLltbfTo6oMpG_xjYHkiNS-Zx4xx30YOOlxZUFixIYbZTAJ2PPiNKo_ubWAUY7zNqaocQU3VdNgbZ-dHcoJYHDAH0xeLRCQjDZ3mjd26RD6xIwyqnd8xM_em79slNjvJpsEed87C4KcV694Ic_vIeRvkLCPpjU1c_9TLs63"/>
+</div>
+<button class="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-white text-red-500 shadow-md ring-1 ring-black/5 hover:bg-gray-50 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<h1 class="mb-1 text-2xl font-bold text-primary-text">Julia Childish</h1>
+<p class="mb-5 text-sm font-medium text-secondary-text">@juliacooks • Member since 2023</p>
+<div class="flex w-full items-center justify-between divide-x divide-orange-200 rounded-2xl bg-white px-4 py-4 shadow-sm">
+<div class="flex flex-1 flex-col items-center gap-1">
+<span class="text-lg font-bold text-primary-text">248</span>
+<span class="text-xs font-medium text-secondary-text uppercase tracking-wide">Recipes</span>
+</div>
+<div class="flex flex-1 flex-col items-center gap-1">
+<span class="text-lg font-bold text-primary-text">15</span>
+<span class="text-xs font-medium text-secondary-text uppercase tracking-wide">Cookbooks</span>
+</div>
+<div class="flex flex-1 flex-col items-center gap-1">
+<span class="text-lg font-bold text-primary-text">12k</span>
+<span class="text-xs font-medium text-secondary-text uppercase tracking-wide">Followers</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6 px-5 pb-12">
+<section>
+<h3 class="mb-3 px-1 text-sm font-bold uppercase tracking-wider text-secondary-text">Account</h3>
+<div class="overflow-hidden rounded-2xl bg-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
+<button class="flex w-full items-center justify-between border-b border-orange-50 p-4 transition-colors hover:bg-orange-50/50 active:bg-orange-50">
+<div class="flex items-center gap-3">
+<div class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-red-500">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</div>
+<span class="font-medium text-primary-text">Personal Information</span>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</button>
+<button class="flex w-full items-center justify-between border-b border-orange-50 p-4 transition-colors hover:bg-orange-50/50 active:bg-orange-50">
+<div class="flex items-center gap-3">
+<div class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-red-500">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<span class="font-medium text-primary-text">Email &amp; Notifications</span>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</button>
+<button class="flex w-full items-center justify-between p-4 transition-colors hover:bg-orange-50/50 active:bg-orange-50">
+<div class="flex items-center gap-3">
+<div class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-red-500">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<span class="font-medium text-primary-text">Privacy &amp; Security</span>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</button>
+</div>
+</section>
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1c1917] to-[#44403c] p-5 shadow-lg">
+<div class="relative z-10 flex items-start justify-between">
+<div>
+<h3 class="mb-1 text-lg font-bold text-white">SaveIt Pro</h3>
+<p class="mb-4 max-w-[200px] text-sm text-gray-300">Unlock unlimited recipes, AI meal planning, and cloud sync.</p>
+<button class="rounded-full bg-white px-4 py-2 text-sm font-bold text-primary-text hover:bg-gray-100 active:scale-95 transition-all">
+                        Upgrade Now
+                    </button>
+</div>
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-orange-300 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[28px] fill-1">diamond</span>
+</div>
+</div>
+<div class="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-white/5"></div>
+</div>
+<section>
+<h3 class="mb-3 px-1 text-sm font-bold uppercase tracking-wider text-secondary-text">Preferences</h3>
+<div class="overflow-hidden rounded-2xl bg-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
+<button class="flex w-full items-center justify-between border-b border-orange-50 p-4 transition-colors hover:bg-orange-50/50 active:bg-orange-50">
+<div class="flex items-center gap-3">
+<div class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-red-500">
+<span class="material-symbols-outlined text-[20px]">restaurant_menu</span>
+</div>
+<span class="font-medium text-primary-text">Dietary Requirements</span>
+</div>
+<span class="text-sm text-secondary-text mr-1">Vegetarian</span>
+</button>
+<button class="flex w-full items-center justify-between border-b border-orange-50 p-4 transition-colors hover:bg-orange-50/50 active:bg-orange-50">
+<div class="flex items-center gap-3">
+<div class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-red-500">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</div>
+<span class="font-medium text-primary-text">Units</span>
+</div>
+<span class="text-sm text-secondary-text mr-1">Metric</span>
+</button>
+<button class="flex w-full items-center justify-between p-4 transition-colors hover:bg-orange-50/50 active:bg-orange-50">
+<div class="flex items-center gap-3">
+<div class="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-red-500">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</div>
+<span class="font-medium text-primary-text">Import Sources</span>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</button>
+</div>
+</section>
+<section>
+<div class="overflow-hidden rounded-2xl bg-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
+<button class="flex w-full items-center justify-center gap-2 p-4 text-red-500 transition-colors hover:bg-red-50 active:bg-red-100">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="font-semibold">Log Out</span>
+</button>
+</div>
+<div class="mt-6 text-center">
+<p class="text-xs text-secondary-text">SaveIt v2.4.0 (Build 302)</p>
+</div>
+</section>
+</div>
+</div>
+
+</body></html>
