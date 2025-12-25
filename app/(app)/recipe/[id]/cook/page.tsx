@@ -1,15 +1,27 @@
-// Description: Cook Mode overlay - full-screen step-by-step cooking interface
+// Description: Cook Mode overlay - full-screen step-by-step cooking interface with timer
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { ProgressBar } from "@/components/primitives/ProgressBar";
 import { CookModeControls } from "@/components/composites/CookModeControls";
+import { Button } from "@/components/ui/button";
 import { recipeRepository } from "@/lib/repositories/RecipeRepository";
 import { RecipeWithDetails } from "@/lib/types/database";
 import Image from "next/image";
-import { Sun, X } from "lucide-react";
+import {
+  Sun,
+  SunDim,
+  X,
+  Timer,
+  Play,
+  Pause,
+  RotateCcw,
+  Check,
+  ChefHat,
+} from "lucide-react";
 
 export default function CookModePage() {
   const params = useParams();
@@ -17,7 +29,20 @@ export default function CookModePage() {
   const recipeId = params.id as string;
   const [recipe, setRecipe] = useState<RecipeWithDetails | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [direction, setDirection] = useState(0); // -1 for prev, 1 for next
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
+  // Timer state
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [showTimerPicker, setShowTimerPicker] = useState(false);
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Wake Lock state
+  const [wakeLockActive, setWakeLockActive] = useState(false);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  // Load recipe
   useEffect(() => {
     async function loadRecipe() {
       const recipeData = await recipeRepository.getByIdWithDetails(recipeId);
@@ -26,10 +51,113 @@ export default function CookModePage() {
     loadRecipe();
   }, [recipeId]);
 
+  // Request Wake Lock
+  useEffect(() => {
+    async function requestWakeLock() {
+      if ("wakeLock" in navigator) {
+        try {
+          wakeLockRef.current = await navigator.wakeLock.request("screen");
+          setWakeLockActive(true);
+          wakeLockRef.current.addEventListener("release", () => {
+            setWakeLockActive(false);
+          });
+        } catch {
+          setWakeLockActive(false);
+        }
+      }
+    }
+    requestWakeLock();
+
+    return () => {
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release();
+      }
+    };
+  }, []);
+
+  // Timer countdown
+  useEffect(() => {
+    if (isTimerRunning && timerSeconds > 0) {
+      timerIntervalRef.current = setInterval(() => {
+        setTimerSeconds((prev) => {
+          if (prev <= 1) {
+            setIsTimerRunning(false);
+            // Play sound/vibrate when timer ends
+            if ("vibrate" in navigator) {
+              navigator.vibrate([200, 100, 200, 100, 200]);
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [isTimerRunning, timerSeconds]);
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const setQuickTimer = (minutes: number) => {
+    setTimerSeconds(minutes * 60);
+    setIsTimerRunning(true);
+    setShowTimerPicker(false);
+  };
+
+  const toggleTimer = () => {
+    if (timerSeconds === 0) {
+      setShowTimerPicker(true);
+    } else {
+      setIsTimerRunning(!isTimerRunning);
+    }
+  };
+
+  const resetTimer = () => {
+    setTimerSeconds(0);
+    setIsTimerRunning(false);
+  };
+
+  const handlePrevious = useCallback(() => {
+    if (currentStepIndex > 0) {
+      setDirection(-1);
+      setCurrentStepIndex(currentStepIndex - 1);
+    }
+  }, [currentStepIndex]);
+
+  const handleNext = useCallback(() => {
+    if (recipe && currentStepIndex < recipe.instructions.length - 1) {
+      setDirection(1);
+      // Mark current step as completed
+      setCompletedSteps((prev) => new Set(prev).add(currentStepIndex));
+      setCurrentStepIndex(currentStepIndex + 1);
+    } else if (recipe) {
+      // Mark last step as completed
+      setCompletedSteps((prev) => new Set(prev).add(currentStepIndex));
+      router.push(`/recipe/${recipeId}`);
+    }
+  }, [currentStepIndex, recipe, recipeId, router]);
+
+  const handleExit = () => {
+    router.push(`/recipe/${recipeId}`);
+  };
+
   if (!recipe) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted">Loading recipe...</p>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        >
+          <ChefHat size={48} className="text-primary" />
+        </motion.div>
       </div>
     );
   }
@@ -40,68 +168,113 @@ export default function CookModePage() {
   const progress =
     totalSteps > 0 ? ((currentStepIndex + 1) / totalSteps) * 100 : 0;
 
-  const handlePrevious = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentStepIndex < totalSteps - 1) {
-      setCurrentStepIndex(currentStepIndex + 1);
-    } else {
-      // Completed - could navigate back or show completion message
-      router.push(`/recipe/${recipeId}`);
-    }
-  };
-
-  const handleExit = () => {
-    router.push(`/recipe/${recipeId}`);
-  };
-
   if (instructions.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
           <p className="text-muted mb-4">
             No instructions available for this recipe.
           </p>
-          <button
-            onClick={handleExit}
-            className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary-hover transition-colors"
-          >
-            Back to Recipe
-          </button>
-        </div>
+          <Button onClick={handleExit}>Back to Recipe</Button>
+        </motion.div>
       </div>
     );
   }
+
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 300 : -300,
+      opacity: 0,
+    }),
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto shadow-2xl">
       {/* Header */}
       <header className="flex items-center justify-between p-6 pt-12 pb-2 bg-background z-20">
-        <div className="flex items-center gap-2 text-primary">
-          <Sun size={20} />
-          <span className="text-xs font-semibold uppercase tracking-wider opacity-80">
-            Screen Awake
-          </span>
-        </div>
-        <button
-          onClick={handleExit}
-          className="group flex items-center gap-2 bg-surface px-4 py-2 rounded-full shadow-sm border border-gray-200 active:scale-95 transition-transform hover:bg-gray-50"
-          aria-label="Exit Cook Mode"
-          tabIndex={0}
+        <motion.div
+          className="flex items-center gap-2 text-primary"
+          animate={{ opacity: wakeLockActive ? 1 : 0.5 }}
         >
-          <span className="text-sm font-bold text-charcoal">Exit Cook Mode</span>
+          {wakeLockActive ? <Sun size={20} /> : <SunDim size={20} />}
+          <span className="text-xs font-semibold uppercase tracking-wider">
+            {wakeLockActive ? "Screen Awake" : "Screen Sleep"}
+          </span>
+        </motion.div>
+        <motion.button
+          onClick={handleExit}
+          whileTap={{ scale: 0.95 }}
+          className="group flex items-center gap-2 bg-surface px-4 py-2 rounded-full shadow-sm border border-gray-200 hover:bg-gray-50"
+          aria-label="Exit Cook Mode"
+        >
+          <span className="text-sm font-bold text-charcoal">Exit</span>
           <X size={20} className="text-gray-500" />
-        </button>
+        </motion.button>
       </header>
 
+      {/* Timer Bar (when active) */}
+      <AnimatePresence>
+        {timerSeconds > 0 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="mx-6 mb-4 overflow-hidden"
+          >
+            <div className="bg-primary/10 rounded-xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={isTimerRunning ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="w-10 h-10 rounded-full bg-primary flex items-center justify-center"
+                >
+                  <Timer size={20} className="text-white" />
+                </motion.div>
+                <span className="text-3xl font-bold text-charcoal font-mono">
+                  {formatTime(timerSeconds)}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={toggleTimer}
+                  className="w-10 h-10 rounded-full bg-surface shadow-sm flex items-center justify-center"
+                >
+                  {isTimerRunning ? (
+                    <Pause size={20} className="text-charcoal" />
+                  ) : (
+                    <Play size={20} className="text-charcoal" />
+                  )}
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={resetTimer}
+                  className="w-10 h-10 rounded-full bg-surface shadow-sm flex items-center justify-center"
+                >
+                  <RotateCcw size={20} className="text-charcoal" />
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Main Content */}
-      <main className="flex-1 flex flex-col px-6 pb-6 pt-4 relative z-10 overflow-y-auto">
+      <main className="flex-1 flex flex-col px-6 pb-6 pt-2 relative z-10 overflow-hidden">
         {/* Progress Bar */}
-        <div className="flex flex-col gap-2 mb-6">
+        <div className="flex flex-col gap-2 mb-4">
           <div className="flex justify-between items-end">
             <h2 className="text-2xl font-bold text-charcoal">
               Step {currentStepIndex + 1}{" "}
@@ -109,40 +282,84 @@ export default function CookModePage() {
                 of {totalSteps}
               </span>
             </h2>
-            <span className="text-primary font-medium text-sm">
-              {currentStepIndex < totalSteps / 2 ? "Preparation" : "Cooking"}
-            </span>
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setShowTimerPicker(true)}
+              className="flex items-center gap-1 text-primary text-sm font-medium"
+            >
+              <Timer size={16} />
+              Set Timer
+            </motion.button>
           </div>
-          <ProgressBar value={progress} showLabel={false} />
+
+          {/* Step indicators */}
+          <div className="flex gap-1">
+            {instructions.map((_, index) => (
+              <motion.div
+                key={index}
+                className={`h-1.5 flex-1 rounded-full ${
+                  index === currentStepIndex
+                    ? "bg-primary"
+                    : completedSteps.has(index)
+                      ? "bg-green-500"
+                      : "bg-gray-200"
+                }`}
+                initial={false}
+                animate={{
+                  scale: index === currentStepIndex ? 1 : 0.95,
+                }}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Active Instruction Card */}
-        <div className="flex-1 flex flex-col justify-between">
-          <div className="bg-surface rounded-2xl shadow-lg p-1 overflow-hidden flex flex-col h-full max-h-[60vh]">
-            {/* Image Area (if recipe has thumbnail) */}
-            {recipe.thumbnail_url && (
-              <div className="relative h-48 shrink-0 w-full overflow-hidden rounded-xl bg-gray-100">
-                <Image
-                  src={recipe.thumbnail_url}
-                  alt={recipe.title}
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              </div>
-            )}
+        {/* Active Instruction Card with Animation */}
+        <div className="flex-1 flex flex-col justify-between overflow-hidden">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={currentStepIndex}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="bg-surface rounded-2xl shadow-lg p-1 overflow-hidden flex flex-col h-full max-h-[55vh]"
+            >
+              {/* Image Area */}
+              {recipe.thumbnail_url && (
+                <div className="relative h-40 shrink-0 w-full overflow-hidden rounded-xl bg-gray-100">
+                  <Image
+                    src={recipe.thumbnail_url}
+                    alt={recipe.title}
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  {completedSteps.has(currentStepIndex) && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute top-3 right-3 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                    >
+                      <Check size={20} className="text-white" />
+                    </motion.div>
+                  )}
+                </div>
+              )}
 
-            {/* Text Content */}
-            <div className="p-6 flex flex-col gap-4 overflow-y-auto">
-              <h3 className="text-2xl font-bold text-charcoal leading-tight">
-                {currentStep.text.split(".")[0]}
-              </h3>
-              <p className="text-xl text-charcoal/80 leading-relaxed">
-                {currentStep.text}
-              </p>
-            </div>
-          </div>
+              {/* Text Content */}
+              <div className="p-6 flex flex-col gap-3 overflow-y-auto">
+                <h3 className="text-xl font-bold text-charcoal leading-tight">
+                  {currentStep.text.split(".")[0]}.
+                </h3>
+                <p className="text-lg text-charcoal/80 leading-relaxed">
+                  {currentStep.text}
+                </p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Navigation Controls */}
@@ -155,6 +372,51 @@ export default function CookModePage() {
           canGoNext={currentStepIndex < totalSteps - 1}
         />
       </main>
+
+      {/* Timer Picker Modal */}
+      <AnimatePresence>
+        {showTimerPicker && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={() => setShowTimerPicker(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-3xl p-6 shadow-xl max-w-md mx-auto"
+            >
+              <h3 className="text-xl font-bold text-charcoal mb-4 text-center">
+                Set Timer
+              </h3>
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                {[1, 2, 5, 10, 15, 20, 30, 45].map((mins) => (
+                  <motion.button
+                    key={mins}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setQuickTimer(mins)}
+                    className="py-4 px-2 bg-primary/10 rounded-xl text-primary font-bold text-lg hover:bg-primary/20 transition-colors"
+                  >
+                    {mins}m
+                  </motion.button>
+                ))}
+              </div>
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => setShowTimerPicker(false)}
+              >
+                Cancel
+              </Button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

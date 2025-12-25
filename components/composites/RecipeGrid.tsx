@@ -35,7 +35,7 @@ const itemVariants = {
     y: 0,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 24,
     },
@@ -66,10 +66,12 @@ export function RecipeGrid({
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className={cn("grid grid-cols-2 gap-4", className)}
+      className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4", className)}
+      role="list"
+      aria-label="Recipe grid"
     >
       {recipes.map((recipe) => (
-        <motion.div key={recipe.id} variants={itemVariants}>
+        <motion.div key={recipe.id} variants={itemVariants} role="listitem">
           <RecipeCard recipe={recipe} />
         </motion.div>
       ))}

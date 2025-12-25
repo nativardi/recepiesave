@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { TopBar } from "./TopBar";
 import { BottomNav } from "./BottomNav";
+import { SkipNav } from "../ui/skip-nav";
 
 interface AppShellProps {
   children: ReactNode;
@@ -16,6 +17,7 @@ interface AppShellProps {
 export function AppShell({ children, topBar }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SkipNav />
       {topBar && (
         <TopBar
           title={topBar.title}
@@ -23,7 +25,9 @@ export function AppShell({ children, topBar }: AppShellProps) {
           rightAction={topBar.rightAction}
         />
       )}
-      <main className="flex-1 pb-28">{children}</main>
+      <main id="main-content" className="flex-1 pb-28" role="main">
+        {children}
+      </main>
       <BottomNav />
     </div>
   );

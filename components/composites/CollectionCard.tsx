@@ -8,13 +8,14 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
+import { memo } from "react";
 
 interface CollectionCardProps {
   collection: CollectionWithRecipes;
   className?: string;
 }
 
-export function CollectionCard({ collection, className }: CollectionCardProps) {
+function CollectionCardComponent({ collection, className }: CollectionCardProps) {
   // Get up to 4 recipe thumbnails for the grid
   const thumbnails = collection.recipes
     .slice(0, 4)
@@ -33,6 +34,7 @@ export function CollectionCard({ collection, className }: CollectionCardProps) {
           "group relative flex flex-col gap-3 rounded-xl bg-surface p-3 shadow-sm transition-shadow",
           className
         )}
+        aria-label={`View collection: ${collection.name} (${collection.recipe_count} recipes)`}
       >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
         {thumbnails.length > 0 ? (
@@ -77,3 +79,6 @@ export function CollectionCard({ collection, className }: CollectionCardProps) {
     </motion.div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const CollectionCard = memo(CollectionCardComponent);

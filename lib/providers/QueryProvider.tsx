@@ -1,10 +1,11 @@
-// Description: TanStack React Query provider wrapper
+// Description: TanStack React Query provider wrapper with theme and toast support
 
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 import { ToastProvider } from "@/components/ui/toast";
+import { ThemeProvider } from "@/lib/providers/ThemeProvider";
 
 interface QueryProviderProps {
   children: ReactNode;
@@ -25,7 +26,9 @@ export function QueryProvider({ children }: QueryProviderProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>{children}</ToastProvider>
+      <ThemeProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

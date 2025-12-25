@@ -8,13 +8,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
 
 @layer base {
+  /* Light mode (default) */
   :root {
-    --background: 255 247 237; /* #fff7ed */
-    --foreground: 61 64 91; /* #3D405B */
+    --color-primary: 234 88 12; /* #ea580c Orange-600 */
+    --color-primary-hover: 194 65 12; /* #c2410c Orange-700 */
+    --color-background: 255 247 237; /* #fff7ed Orange-50 */
+    --color-surface: 255 255 255; /* #ffffff White */
+    --color-charcoal: 61 64 91; /* #3D405B */
+    --color-muted: 120 113 108; /* #78716c Stone-500 */
+    --color-accent: 239 68 68; /* #ef4444 Red-500 */
+  }
+
+  /* Dark mode */
+  .dark {
+    --color-primary: 249 115 22; /* #f97316 Orange-500 (brighter for dark) */
+    --color-primary-hover: 234 88 12; /* #ea580c Orange-600 */
+    --color-background: 23 23 23; /* #171717 Neutral-900 */
+    --color-surface: 38 38 38; /* #262626 Neutral-800 */
+    --color-charcoal: 245 245 245; /* #f5f5f5 Neutral-100 */
+    --color-muted: 163 163 163; /* #a3a3a3 Neutral-400 */
+    --color-accent: 248 113 113; /* #f87171 Red-400 */
   }
 
   body {
-    @apply bg-background text-charcoal;
+    @apply bg-background text-charcoal transition-colors duration-200;
   }
 }
 

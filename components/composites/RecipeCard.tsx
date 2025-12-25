@@ -10,13 +10,14 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Video, Timer, Heart, Utensils } from "lucide-react";
+import { memo } from "react";
 
 interface RecipeCardProps {
   recipe: Recipe;
   className?: string;
 }
 
-export function RecipeCard({ recipe, className }: RecipeCardProps) {
+function RecipeCardComponent({ recipe, className }: RecipeCardProps) {
   const toggleFavorite = useToggleFavorite();
   const { showToast } = useToast();
 
@@ -60,6 +61,7 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
         "group flex flex-col bg-surface rounded-2xl p-2 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
         className
       )}
+      aria-label={`View recipe: ${recipe.title}`}
     >
       <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-gray-100">
         {recipe.thumbnail_url ? (
@@ -130,3 +132,6 @@ export function RecipeCard({ recipe, className }: RecipeCardProps) {
     </Link>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const RecipeCard = memo(RecipeCardComponent);

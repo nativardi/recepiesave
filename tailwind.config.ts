@@ -7,16 +7,17 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        primary: "#ea580c", // Orange-600
-        "primary-hover": "#c2410c", // Orange-700
-        background: "#fff7ed", // Orange-50
-        surface: "#ffffff",
-        charcoal: "#3D405B",
-        muted: "#78716c", // Stone-500
-        accent: "#ef4444", // Red-500
+        primary: "rgb(var(--color-primary) / <alpha-value>)",
+        "primary-hover": "rgb(var(--color-primary-hover) / <alpha-value>)",
+        background: "rgb(var(--color-background) / <alpha-value>)",
+        surface: "rgb(var(--color-surface) / <alpha-value>)",
+        charcoal: "rgb(var(--color-charcoal) / <alpha-value>)",
+        muted: "rgb(var(--color-muted) / <alpha-value>)",
+        accent: "rgb(var(--color-accent) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["var(--font-urbanist)", "sans-serif"],
