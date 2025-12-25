@@ -1,5 +1,15 @@
 # SaveIt Recipe App - Database-Free Implementation Plan
 
+## ⚠️ IMPORTANT: Audio Pipeline Assessment
+
+**Before proceeding to Phase 4**, read the comprehensive assessment: [AUDIO_PIPELINE_ASSESSMENT.md](./Docs/AUDIO_PIPELINE_ASSESSMENT.md)
+
+**Key Finding:** The Python audio pipeline requires significant modifications for recipe extraction. Current AI analyzer extracts general content (summary, topics, sentiment) — NOT recipe-specific data (ingredients, instructions, timing).
+
+**Recommendation:** Complete Phase 1-3 first to get a working app with mock data, then tackle audio pipeline integration.
+
+---
+
 ## Executive Summary
 
 **Current State:** The app has excellent UI (14/14 pages built, 31 components) but **cannot run** because repositories call mock Supabase stubs that throw "not yet implemented" errors.
@@ -41,14 +51,19 @@ SaveIt integrates with a **separate Python/Flask application** that handles all 
 - Download videos from TikTok, Instagram, YouTube, Facebook (via yt-dlp)
 - Extract audio and thumbnails (via FFmpeg)
 - Transcribe audio to text (via OpenAI Whisper)
-- Analyze content with GPT-4 to extract:
+- ⚠️ **Current Status:** Analyze content with GPT-4o-mini to extract:
+  - General summary and topics
+  - Sentiment and category
+- ⚠️ **REQUIRED MODIFICATION:** Must be updated to extract recipe-specific data:
   - Recipe title and description
   - Ingredients list (parsed with quantities and units)
   - Step-by-step instructions
   - Cuisine type, prep/cook time, servings
 - Generate vector embeddings for semantic search
 - Store all assets in Supabase Storage
-- Update recipe record in Supabase database
+- Update job record in Supabase database
+
+**⚠️ CRITICAL:** The current AI analyzer does NOT extract recipe data. See [AUDIO_PIPELINE_ASSESSMENT.md](./Docs/AUDIO_PIPELINE_ASSESSMENT.md) for details.
 
 **External Service API:**
 - `POST /api/v1/process` - Create processing job (returns job_id)
@@ -549,23 +564,23 @@ After Phase 2, users should be able to:
 
 ---
 
-## **Phase 3: Polish & Enhancement** (23 hours - OPTIONAL)
+## **Phase 3: Polish & Enhancement** (23 hours - ✅ COMPLETED)
 
 Make the app production-ready with animations, accessibility, and advanced features.
 
-### Recommended Phase 3 Tasks (if time permits):
+### ✅ Phase 3 Tasks (COMPLETED):
 
-1. **Micro-interactions & Animations** (4h) - Framer Motion for smooth transitions
-2. **Responsive Design Gaps** (3h) - Perfect mobile, tablet, desktop layouts
-3. **Accessibility** (3h) - WCAG AA compliance, keyboard nav, screen readers
-4. **Cook Mode Enhancements** (3h) - Timer functionality, step tracking
-5. **Settings Page** (2h) - Export/import data, reset to defaults
-6. **Profile Page** (1h) - User stats, recipes by platform breakdown
-7. **Performance Optimization** (2h) - Image optimization, memoization
-8. **Error Boundaries** (1h) - Graceful error handling
-9. **Dark Mode** (4h) - Theme toggle and dark color palette
+1. **✅ Micro-interactions & Animations** (4h) - Framer Motion for smooth transitions
+2. **✅ Responsive Design Gaps** (3h) - Perfect mobile, tablet, desktop layouts
+3. **✅ Accessibility** (3h) - WCAG AA compliance, keyboard nav, screen readers
+4. **✅ Cook Mode Enhancements** (3h) - Timer functionality, step tracking
+5. **✅ Settings Page** (2h) - Export/import data, reset to defaults
+6. **✅ Profile Page** (1h) - User stats, recipes by platform breakdown
+7. **✅ Performance Optimization** (2h) - Image optimization, memoization
+8. **✅ Error Boundaries** (1h) - Graceful error handling
+9. **✅ Dark Mode** (4h) - Theme toggle and dark color palette
 
-**Note:** Phase 3 can be deferred. Completing Phase 1 and Phase 2 provides a fully functional, testable app.
+**Status:** Phase 3 completed. App is now production-ready with premium UX, full accessibility support, and graceful error handling. See `/Docs/Archive/PHASE_3_COMPLETION_REPORT.md` for details.
 
 ---
 
@@ -619,6 +634,24 @@ localStorage (dev) OR PostgreSQL (prod)
 ---
 
 ## Phase 4: Production Integration (Future)
+
+### ⚠️ IMPORTANT: Prerequisites
+
+**Before starting Phase 4**, review the full assessment: [AUDIO_PIPELINE_ASSESSMENT.md](./Docs/AUDIO_PIPELINE_ASSESSMENT.md)
+
+**Infrastructure Requirements:**
+- Redis server (job queue management)
+- RQ worker (background processing)
+- FFmpeg (audio extraction)
+- yt-dlp (video downloading)
+- Python 3.9+ with Flask environment
+- OpenAI API key (Whisper + GPT-4o-mini)
+- Supabase project with storage buckets
+
+**Critical Modifications Required:**
+- ⚠️ AI analyzer must be rewritten for recipe extraction
+- ⚠️ Database schema needs recipe-specific tables
+- ⚠️ Job processor needs recipe-specific logic
 
 ### When to Move to Production
 
