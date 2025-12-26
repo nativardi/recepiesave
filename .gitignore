@@ -57,3 +57,45 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+extraction/venv/
+extraction/.venv/
+recipe-extraction/venv/
+recipe-extraction/.venv/
+venv/
+ENV/
+env/
+
+# Environment variables (Python services)
+extraction/.env
+recipe-extraction/.env
+
+# Redis
+dump.rdb
+
+# Python service logs
+extraction/*.log
+recipe-extraction/*.log
