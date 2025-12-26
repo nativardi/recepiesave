@@ -1,0 +1,5 @@
+# recipe-extraction/requirements.txt
+# Additional dependencies beyond what IG Downloader provides
+
+# None yet - we'll reuse IG Downloader's dependencies
+# If needed later, add here (e.g., specific parsers)
