@@ -1,0 +1,29 @@
+# Description: Python dependencies for Instagram Reel Audio Downloader
+# Core web framework
+Flask==3.0.0
+flask-cors==4.0.0
+flask-limiter==3.5.0
+
+# Instagram content fetching
+yt-dlp>=2025.11.12
+
+# HTTP handling
+requests==2.31.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Supabase client
+supabase>=2.0.0
+
+# OpenAI API
+openai>=1.0.0
+
+# Job queue (RQ + Redis)
+rq>=1.15.0
+redis>=5.0.0
+
+# JavaScript runtime for yt-dlp (YouTube extractor)
+js2py>=0.74
+quickjs>=1.19.4
+
