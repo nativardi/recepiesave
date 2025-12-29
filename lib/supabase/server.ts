@@ -1,50 +1,54 @@
-// Description: Mock Supabase client for server-side usage (Server Components, Route Handlers)
-// TODO: Replace with real Supabase client in Phase 2
+// Description: Supabase client for server-side usage (Server Components, Route Handlers)
 
-import type { MockSupabaseClient } from "./client";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 /**
- * Creates a mock Supabase client for server-side usage
- * Returns a client that throws errors for all operations
+ * Creates a Supabase client for server-side usage.
+ * Uses cookies for auth session management.
  */
-export async function createServerSupabaseClient(): Promise<MockSupabaseClient> {
-  const notImplementedError = new Error(
-    "Supabase integration not yet implemented. Full backend integration coming in Phase 2."
+export async function createServerSupabaseClient() {
+  const cookieStore = await cookies();
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing user sessions.
+          }
+        },
+      },
+    }
   );
+}
 
-  const mockAuthResponse = {
-    data: { user: null, session: null },
-    error: notImplementedError,
-  };
+/**
+ * Creates a Supabase admin client with service role key.
+ * Use this for operations that need elevated privileges.
+ * WARNING: Never expose this client to the browser!
+ */
+export function createServiceRoleClient() {
+  const { createClient } = require("@supabase/supabase-js");
 
-  const mockUserResponse = {
-    data: { user: null },
-    error: notImplementedError,
-  };
-
-  // Create a chainable query builder mock
-  const createQueryBuilder = () => {
-    const builder: any = {
-      select: () => builder,
-      insert: () => builder,
-      update: () => builder,
-      delete: () => builder,
-      eq: () => builder,
-      single: () => Promise.resolve({ data: null, error: notImplementedError }),
-      then: (resolve: any) =>
-        resolve({ data: null, error: notImplementedError }),
-    };
-    return builder;
-  };
-
-  return {
-    auth: {
-      signUp: async () => mockAuthResponse,
-      signInWithPassword: async () => mockAuthResponse,
-      signInWithOAuth: async () => ({ data: null, error: notImplementedError }),
-      signOut: async () => ({ error: notImplementedError }),
-      getUser: async () => mockUserResponse,
-    },
-    from: () => createQueryBuilder(),
-  };
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
 }

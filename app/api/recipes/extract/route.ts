@@ -2,9 +2,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  enqueueRecipeExtraction,
+  checkRedisConnection,
+} from "@/lib/extraction/queue";
 
 // Helper to detect platform from URL
-function detectPlatform(url: string): "tiktok" | "instagram" | "youtube" | "facebook" | null {
+function detectPlatform(
+  url: string
+): "tiktok" | "instagram" | "youtube" | "facebook" | null {
   if (url.includes("tiktok.com") || url.includes("vm.tiktok.com")) {
     return "tiktok";
   }
@@ -32,6 +38,9 @@ function isValidUrl(url: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if we're in dev mode (use mock data)
+    const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+
     // Get authenticated user from Supabase (server-side)
     const supabase = await createServerSupabaseClient();
     const {
@@ -59,17 +68,17 @@ export async function POST(request: NextRequest) {
 
     // Validate URL format
     if (!isValidUrl(url)) {
-      return NextResponse.json(
-        { error: "Invalid URL format" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
     }
 
     // Detect platform
     const platform = detectPlatform(url);
     if (!platform) {
       return NextResponse.json(
-        { error: "Unsupported platform. Only TikTok, Instagram, YouTube, and Facebook are supported." },
+        {
+          error:
+            "Unsupported platform. Only TikTok, Instagram, YouTube, and Facebook are supported.",
+        },
         { status: 400 }
       );
     }
@@ -95,32 +104,63 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: In real implementation, enqueue job to Redis/RQ worker here
-    // For now, we simulate async processing with a delayed status update
+    // In dev mode, just simulate processing without Redis
+    if (isDevMode) {
+      console.log("[DEV MODE] Simulating recipe extraction for:", recipe.id);
+      return NextResponse.json({
+        recipe_id: recipe.id,
+        status: recipe.status,
+        message: "Recipe extraction started (dev mode)",
+      });
+    }
 
-    // Simulate starting processing
-    setTimeout(async () => {
-      try {
-        await supabase
-          .from("recipes")
-          .update({ status: "processing" })
-          .eq("id", recipe.id);
-      } catch (err) {
-        console.error("Error updating recipe status in background:", err);
+    // Production mode: enqueue job to Redis for Python worker
+    try {
+      // Check Redis connection first
+      const redisConnected = await checkRedisConnection();
+      if (!redisConnected) {
+        console.warn(
+          "Redis not available, recipe will remain in pending status"
+        );
+        return NextResponse.json({
+          recipe_id: recipe.id,
+          status: recipe.status,
+          message:
+            "Recipe created but extraction queue unavailable. Will retry.",
+          warning: "Redis connection unavailable",
+        });
       }
-    }, 1000);
 
-    return NextResponse.json({
-      recipe_id: recipe.id,
-      status: recipe.status,
-      message: "Recipe extraction started",
-    });
+      // Enqueue the extraction job
+      const jobId = await enqueueRecipeExtraction({
+        recipe_id: recipe.id,
+        url: url,
+        user_id: user.id,
+      });
+
+      console.log(`Recipe extraction job enqueued: ${jobId} for ${recipe.id}`);
+
+      return NextResponse.json({
+        recipe_id: recipe.id,
+        job_id: jobId,
+        status: recipe.status,
+        message: "Recipe extraction started",
+      });
+    } catch (queueError) {
+      console.error("Failed to enqueue recipe extraction:", queueError);
+      // Recipe was created, but job wasn't enqueued
+      // Return success but with a warning
+      return NextResponse.json({
+        recipe_id: recipe.id,
+        status: recipe.status,
+        message: "Recipe created but extraction queue failed",
+        warning: "Extraction job not enqueued",
+      });
+    }
   } catch (error) {
     console.error("Error creating recipe:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to create recipe";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to create recipe";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

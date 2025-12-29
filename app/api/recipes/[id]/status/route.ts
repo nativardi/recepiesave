@@ -33,11 +33,13 @@ export async function GET(
     }
 
     // Calculate progress based on status
+    // Status flow: pending -> downloading -> extracting_audio -> transcribing -> analyzing -> completed
     const progressMap: Record<string, number> = {
-      pending: 0,
-      processing: 25,
-      transcribing: 50,
-      analyzing: 75,
+      pending: 5,
+      downloading: 15,
+      extracting_audio: 35,
+      transcribing: 55,
+      analyzing: 80,
       completed: 100,
       failed: 0,
     };

@@ -44,19 +44,19 @@ export default function AddRecipePage() {
     setProgress(0);
 
     try {
-      const user = await getCurrentUser();
-      const platform = detectPlatform(url);
-
-      // Create recipe with pending status
-      const newRecipe = await recipeRepository.create({
-        user_id: user.id,
-        original_url: url,
-        platform: platform,
-        status: "pending",
-      });
-
       if (isDevMode) {
         // Dev mode: Use mock processing simulation
+        const user = await getCurrentUser();
+        const platform = detectPlatform(url);
+
+        // Create recipe with pending status via mock repository
+        const newRecipe = await recipeRepository.create({
+          user_id: user.id,
+          original_url: url,
+          platform: platform,
+          status: "pending",
+        });
+
         // Start progress animation
         const progressInterval = setInterval(() => {
           setProgress((prev) => {
@@ -76,9 +76,9 @@ export default function AddRecipePage() {
           clearInterval(progressInterval);
           setProgress(100);
           router.push("/dashboard");
-        }, 4500); // Matches total simulation time (1000 + 1500 + 1500 + buffer)
+        }, 4500);
       } else {
-        // Production mode: Call API route which calls external service
+        // Production mode: Call the real API endpoint
         const progressInterval = setInterval(() => {
           setProgress((prev) => {
             if (prev >= 90) {
@@ -89,22 +89,32 @@ export default function AddRecipePage() {
           });
         }, 300);
 
-        // TODO: In production, call API endpoint
-        // const response = await fetch('/api/recipes/extract', {
-        //   method: 'POST',
-        //   body: JSON.stringify({ url }),
-        //   headers: { 'Content-Type': 'application/json' },
-        // });
+        const response = await fetch("/api/recipes/extract", {
+          method: "POST",
+          body: JSON.stringify({ url }),
+          headers: { "Content-Type": "application/json" },
+        });
 
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to start recipe extraction");
+        }
+
+        // Recipe extraction has started, navigate to dashboard
+        clearInterval(progressInterval);
+        setProgress(100);
+
+        // Short delay for UX smoothness
         setTimeout(() => {
-          clearInterval(progressInterval);
-          setProgress(100);
           router.push("/dashboard");
-        }, 2500);
+        }, 500);
       }
     } catch (error) {
       console.error("Error:", error);
-      setErrorMessage("Something went wrong. Please try again.");
+      const message =
+        error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      setErrorMessage(message);
       setPageState("error");
     }
   };

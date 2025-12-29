@@ -1,16 +1,86 @@
-# SaveIt Recipe App - Database-Free Implementation Plan
+# SaveIt Recipe App - Implementation Plan
 
-## Current Status: Ready for Phase 4
+## Current Status: Phase 4 COMPLETE ✅
 
-**Phases 1-3: COMPLETE ✅** - See [PHASE_3_COMPLETION_REPORT.md](./Docs/Archive/PHASE_3_COMPLETION_REPORT.md)
+**Phases 1-4: ALL COMPLETE**
 
-**Next Step:** Phase 4 - Audio Pipeline Integration
+- **Phases 1-3:** See [PHASE_3_COMPLETION_REPORT.md](./Docs/Archive/PHASE_3_COMPLETION_REPORT.md)
+- **Phase 4:** Audio Pipeline Integration - COMPLETE (December 2024)
 
 **Integration Strategy:** Wrapper/Adapter Pattern - Git Subtree import of IG Downloader (pristine) + custom recipe-extraction service
 
 **Detailed Plan:** [AUDIO_PIPELINE_INTEGRATION_PLAN.md](./Docs/AUDIO_PIPELINE_INTEGRATION_PLAN.md)
 
 **Key Decision:** IG Downloader remains general-purpose and unmodified. Recipe-specific logic lives in `recipe-extraction/` folder.
+
+---
+
+## Phase 4 Completion Summary
+
+### What Was Built
+
+**Python Recipe Extraction Service** (`recipe-extraction/`):
+- `recipe_analyzer.py` - GPT-4o-mini recipe extraction from transcripts
+- `data_mapper.py` - Maps AI output to database schema
+- `recipe_processor.py` - Main orchestration (download → audio → transcribe → analyze → store)
+- `config.py` - Configuration management
+- `recipe_worker.py` - Redis queue worker for background job processing
+
+**Next.js API Integration** (`app/api/` and `lib/`):
+- `app/api/recipes/extract/route.ts` - Job submission API with Redis queue integration
+- `lib/extraction/queue.ts` - TypeScript Redis queue bridge
+- `lib/supabase/server.ts` - Real Supabase client with SSR support
+
+**Frontend Integration**:
+- `app/(app)/add/page.tsx` - Wired to real API with dev mode toggle
+- Updated status progress mapping for new pipeline stages
+
+### How It Works
+
+```
+User pastes URL → Next.js API → Redis Queue → Python Worker
+                                                    ↓
+                                            PlatformRouter (IG Downloader)
+                                                    ↓
+                                            Download video → Extract audio → Transcribe (Whisper)
+                                                    ↓
+                                            Recipe Analyzer (GPT-4o-mini)
+                                                    ↓
+                                            Data Mapper → Supabase Database
+```
+
+### Running the Pipeline
+
+```bash
+# Terminal 1: Start Redis
+docker-compose up -d
+
+# Terminal 2: Start Python worker
+cd recipe-extraction
+source ../extraction/venv/bin/activate
+python recipe_worker.py
+
+# Terminal 3: Start Next.js
+npm run dev
+```
+
+### Environment Setup
+
+Required in `.env.local`:
+```bash
+NEXT_PUBLIC_DEV_MODE=false  # Set to false for real extraction
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
+SUPABASE_SERVICE_ROLE_KEY=xxx
+REDIS_URL=redis://localhost:6379
+OPENAI_API_KEY=sk-xxx
+```
+
+### Next Steps (Optional)
+
+- **Production deployment**: Deploy Python worker to Render, use Upstash for Redis
+- **Supabase storage buckets**: Run SQL from `recipe-extraction/README.md`
+- **Testing**: Test with real Instagram/TikTok/YouTube URLs
 
 ---
 

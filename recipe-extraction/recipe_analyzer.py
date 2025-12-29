@@ -1,0 +1,162 @@
+"""
+Recipe-specific AI analyzer using GPT-4o-mini.
+Extracts structured recipe data from transcripts.
+"""
+import json
+import logging
+from typing import Dict, Optional
+from openai import OpenAI
+
+logger = logging.getLogger(__name__)
+
+
+def extract_recipe_from_transcript(transcript: str, metadata: Optional[Dict] = None) -> Dict:
+    """
+    Extract recipe information from transcript using GPT-4o-mini.
+
+    Args:
+        transcript: Full transcript text from video
+        metadata: Optional video metadata (title, description)
+
+    Returns:
+        {
+            "title": str,
+            "description": str,
+            "ingredients": [
+                {"item": str, "quantity": float, "unit": str, "raw_text": str}
+            ],
+            "instructions": [
+                {"step": int, "text": str}
+            ],
+            "prep_time_minutes": int,
+            "cook_time_minutes": int,
+            "servings": int,
+            "cuisine": str,
+            "dietary_tags": [str]
+        }
+    """
+    try:
+        logger.info(f"Extracting recipe from transcript (length: {len(transcript)} chars)")
+
+        client = OpenAI()
+
+        # Build context from metadata if available
+        context = ""
+        if metadata:
+            if metadata.get('title'):
+                context += f"Video Title: {metadata['title']}\n"
+            if metadata.get('description'):
+                context += f"Description: {metadata['description']}\n"
+
+        # Recipe extraction prompt
+        prompt = f"""Extract recipe information from this cooking video transcript.
+
+{context}
+Transcript:
+{transcript}
+
+Please analyze the transcript and extract recipe information in JSON format with this exact structure:
+
+{{
+    "title": "Recipe name (create a descriptive title if not explicitly stated)",
+    "description": "Brief 1-2 sentence description of the dish",
+    "ingredients": [
+        {{
+            "item": "ingredient name (normalized, singular)",
+            "quantity": 1.0,
+            "unit": "cup",
+            "raw_text": "1 cup flour"
+        }}
+    ],
+    "instructions": [
+        {{
+            "step": 1,
+            "text": "Detailed instruction text"
+        }}
+    ],
+    "prep_time_minutes": 10,
+    "cook_time_minutes": 20,
+    "servings": 4,
+    "cuisine": "Italian",
+    "dietary_tags": ["vegetarian"]
+}}
+
+Guidelines:
+- Extract ALL ingredients mentioned, preserving quantities and units
+- If quantity/unit is unclear, set to null but include in raw_text
+- Normalize ingredient names (e.g., "tomatoes" → "tomato")
+- Number instructions sequentially starting from 1
+- Be specific in instruction text (include timing, temperature, techniques)
+- Estimate prep/cook time if not explicitly stated
+- Cuisine should be one of: Italian, Mexican, Chinese, Japanese, Thai, Indian, French, American, Mediterranean, or "Other"
+- Dietary tags: vegetarian, vegan, gluten-free, dairy-free, keto, paleo, etc.
+- If this is NOT a recipe (e.g., just talking about food), set title to "Not a recipe" and leave other fields minimal
+
+Respond with ONLY valid JSON, no additional text."""
+
+        # Call OpenAI API
+        logger.info("Sending transcript to GPT-4o-mini for recipe analysis...")
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a culinary AI assistant specialized in extracting structured recipe data from video transcripts. Always respond with valid JSON only."
+                },
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,  # Lower temperature for consistent extraction
+            max_tokens=2000
+        )
+
+        # Extract response
+        response_text = response.choices[0].message.content.strip()
+
+        # Parse JSON response
+        try:
+            # Remove markdown code blocks if present
+            if response_text.startswith("```json"):
+                response_text = response_text[7:]
+            if response_text.startswith("```"):
+                response_text = response_text[3:]
+            if response_text.endswith("```"):
+                response_text = response_text[:-3]
+            response_text = response_text.strip()
+
+            recipe_data = json.loads(response_text)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse AI response as JSON: {response_text[:200]}")
+            raise RuntimeError(f"Failed to parse recipe extraction response: {str(e)}")
+
+        # Validate required fields
+        required_fields = ['title', 'ingredients', 'instructions']
+        for field in required_fields:
+            if field not in recipe_data:
+                logger.error(f"Missing required field '{field}' in AI response")
+                raise ValueError(f"AI response missing required field: {field}")
+
+        # Validate it's actually a recipe
+        if recipe_data.get('title', '').lower() == 'not a recipe':
+            logger.warning("Content is not a recipe")
+            raise ValueError("Video does not contain recipe content")
+
+        # Set defaults for optional fields
+        recipe_data.setdefault('description', '')
+        recipe_data.setdefault('prep_time_minutes', None)
+        recipe_data.setdefault('cook_time_minutes', None)
+        recipe_data.setdefault('servings', None)
+        recipe_data.setdefault('cuisine', 'Other')
+        recipe_data.setdefault('dietary_tags', [])
+
+        logger.info(
+            f"Recipe extraction complete. "
+            f"Title: {recipe_data['title']}, "
+            f"Ingredients: {len(recipe_data['ingredients'])}, "
+            f"Steps: {len(recipe_data['instructions'])}"
+        )
+
+        return recipe_data
+
+    except Exception as e:
+        logger.error(f"Recipe extraction failed: {e}", exc_info=True)
+        raise RuntimeError(f"Failed to extract recipe: {str(e)}")

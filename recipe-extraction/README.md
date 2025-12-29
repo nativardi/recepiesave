@@ -136,6 +136,39 @@ Watch the worker logs to see the pipeline progress.
 4. **Maintainable** - Clear boundaries between general and recipe-specific code
 5. **Upgradeable** - Can pull IG Downloader updates without conflicts
 
+## Supabase Storage Setup
+
+Create these storage buckets in your Supabase project:
+
+```sql
+-- Run in Supabase SQL Editor
+
+-- Create thumbnails bucket (public)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('recipe-thumbnails', 'recipe-thumbnails', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Create audio bucket (private, temporary)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('recipe-audio', 'recipe-audio', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Set up storage policies for thumbnails (public read)
+CREATE POLICY "Public read for thumbnails"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'recipe-thumbnails');
+
+-- Allow service role to upload thumbnails
+CREATE POLICY "Service role can upload thumbnails"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'recipe-thumbnails');
+
+-- Allow service role to upload audio
+CREATE POLICY "Service role can upload audio"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'recipe-audio');
+```
+
 ## Future Enhancements
 
 - Caching of transcripts (avoid re-transcribing)

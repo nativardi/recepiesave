@@ -2,17 +2,53 @@
 
 # SaveIt (Recipe Edition) — Technical Strategy & Build Pipeline
 
-## Status
+## 🎯 Purpose of This File
 
-- **Inputs available now**: PRD + UI/UX Map + UI Design Doc + Master UI Spec + DB schema + **16 HTML screens** (Tailwind) in `Recepie app UI/`.
-- **Agreed adjustments**:
-  - **Design-system normalization**: unify tokens (colors, fonts, radii) in app config.
-  - **Icons**: keep **Material Symbols** initially for speed.
-  - **Auth**: delay implementation until core features are working (dev bypass mode).
-- **Architecture decision**: **Standalone monolith** — embed audio processing pipeline directly into this project.
-- **Supabase operations**: All database/storage tasks handled via **Supabase MCP**.
-- **Build approach**: Screen-by-screen conversion with incremental component extraction (see Section 5).
-- **Implementation strategy**: **UI-first with mocks** — build and validate all screens with mock data, then wire backend progressively. Backend/worker setup is deferred until UI flows are proven.
+**This document defines the architectural patterns, design philosophy, and system structure for SaveIt.**
+
+It explains:
+- Why we use certain technologies and patterns
+- How the extraction pipeline works end-to-end
+- Component organization philosophy
+- Screen build methodology
+- Deployment architecture
+
+⚠️ **This is reference documentation**, not a task list. For specific implementation tasks, go to [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md).
+
+---
+
+## 📋 When Claude Should Use This File
+
+| Scenario | What to Read |
+|----------|--------------|
+| "How should I structure this component?" | Section 3 (UI/UX Philosophy) + Section 5 (HTML→React strategy) + Section 6 (Component Library) |
+| "How does the extraction pipeline work?" | Section 12 (Audio Pipeline Integration) |
+| "What's the deployment strategy?" | Section 12 (Deployment subsection) |
+| "How do I think about component reuse?" | Section 3 (Quality First philosophy) |
+| "What's the tech stack?" | Section 2 (Tech Stack) |
+| "What screens do I need to build and in what order?" | Section 7 (Screen Build Sequencing) |
+| "I need to assign a specific task to someone" | Go to **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** instead |
+
+---
+
+## 📌 Status & Current State
+
+**All phases complete ✅** (See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for phase details)
+
+**What has been built:**
+- ✅ Frontend: Next.js app with all screens, components, and UI Polish
+- ✅ Data layer: Supabase integration with RLS policies
+- ✅ Extraction pipeline: Python service with Redis queue, OpenAI integration
+- ✅ Auth: Supabase authentication with dev bypass mode
+- ✅ Production-ready: All 4 phases complete
+
+**This document:**
+- Describes architectural decisions that were made
+- Explains the reasoning behind the system design
+- Serves as reference for **why** things were built a certain way
+- Should be consulted when making **architectural decisions** or understanding **system design**
+
+**Note**: Some sections below refer to the *original planning phase* (e.g., "Wave 1 screens to build"). These are now complete but kept as reference for understanding the design philosophy and component organization.
 
 ---
 
@@ -1208,3 +1244,25 @@ const config = {
 | YouTube | `youtube.com/shorts/`, `youtu.be/` |
 | Facebook | `facebook.com/reel/`, `fb.watch/` |
 
+---
+
+## 📚 How This Document Fits Into the Project
+
+**Project Status**: All 4 phases are complete ✅
+
+This document served as the **technical blueprint** during development. Now it serves as:
+
+1. **Reference for existing decisions** - Why was the monolith architecture chosen? Why component extraction methodology? It's all here.
+2. **Guide for consistency** - New developers should read Section 3 (UI/UX Philosophy) and Section 6 (Component Library) to understand code style and component patterns.
+3. **Architecture understanding** - Section 12 explains the extraction pipeline architecture in detail.
+
+**What to do if you need to:**
+- **Understand a design decision**: Read the relevant section in this document
+- **Make a new task or assign work**: Go to [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)
+- **Understand project status**: Go to [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)
+- **Get started developing**: Read [CLAUDE.md](./CLAUDE.md)
+
+---
+
+**Last Updated**: December 29, 2025
+**Status**: Reference document for completed system architecture ✅

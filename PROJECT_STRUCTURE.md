@@ -1,5 +1,29 @@
 # SaveIt Recipe App - Project Structure
 
+## 🎯 Purpose of This File
+
+**This is a quick reference and navigation guide.** Use it to:
+- Understand where things are in the project
+- Get current status at a glance
+- Find which documentation to read next
+- Understand the overall structure
+
+⚠️ **For detailed implementation tasks**, refer to **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** — that's the source of truth for what to build.
+
+---
+
+## 📋 When Claude Should Use This File
+
+| Scenario | What to Do |
+|----------|-----------|
+| "Where should I find X component?" | Search the directory structure below |
+| "What phase are we in?" | Check "Current Implementation Status" |
+| "Which docs should I read?" | Check "Root Documentation Files" |
+| "What's the exact task I need to do?" | Go to **IMPLEMENTATION_PLAN.md** instead |
+| "How should I architecture this?" | Go to **TECHNICAL_STRATEGY.md** instead |
+
+---
+
 ## 📁 Project Organization
 
 ### Root Documentation Files
@@ -59,45 +83,49 @@
 
 ## 🎯 Current Implementation Status
 
-### ✅ Completed Phases
+### ✅ Completed Phases (All 4 Complete)
 
-**Phase 1: Data Layer + Mock Processing**
+**Phase 1: Data Layer + Mock Processing** ✅
 - MockDataStore with localStorage persistence
 - Environment-aware repositories (dev/prod branching)
 - Mock recipe processing simulation
 - Full CRUD operations
 
-**Phase 2: Essential Features**
+**Phase 2: Essential Features** ✅
 - Favorite/unfavorite recipes
 - Recipe editing (notes, timing, cuisine)
 - Collections management (create, edit, delete)
 - Add/remove recipes from collections
 - Platform and favorites filtering
-- Toast notifications
-- Empty states polish
-- Loading states
+- Toast notifications, empty states, loading states
 
-### 🚧 Current Phase
-
-**Phase 3: Polish & Enhancement** (Optional - 23 hours)
+**Phase 3: Polish & Enhancement** ✅
 - Micro-interactions & animations
-- Responsive design gaps
+- Responsive design
 - Accessibility (WCAG AA)
 - Cook mode enhancements
 - Settings page (export/import)
 - Performance optimization
-- Error boundaries
-- Dark mode
+- Error boundaries, Dark mode
 
-### ⏸️ Future Phases
+**Phase 4: Production Integration** ✅ **COMPLETE** (December 2024)
+- ✅ Python Recipe Extraction Service (`recipe-extraction/`)
+- ✅ Redis queue integration
+- ✅ OpenAI Whisper + GPT-4o-mini pipeline
+- ✅ Supabase database integration
+- ✅ Real authentication
+- ✅ Multi-user support
+- ✅ Cloud storage + vector embeddings
 
-**Phase 4: Production Integration** (Future - 13 hours)
-- External Python/Flask service integration
-- Supabase database migration
-- Real authentication
-- Multi-user support
-- Cloud storage
-- Vector search
+### 📍 Current State
+
+**Status**: All phases complete. App is production-ready with full recipe extraction pipeline.
+
+**Key architecture**:
+- Frontend: Next.js with dev mode toggle (`NEXT_PUBLIC_DEV_MODE`)
+- Data: Supabase PostgreSQL (prod) / localStorage (dev)
+- Extraction: Python worker + Redis queue
+- See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for latest details
 
 ## 🔧 Development Mode
 
@@ -108,17 +136,33 @@ The app currently runs in **dev mode** with:
 - Dev user bypass for authentication
 - Simulated recipe processing
 
-## 📚 Key References
+## 📚 Documentation Hierarchy
 
-- **Implementation Plan**: See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for detailed task breakdown
-- **Technical Strategy**: See [TECHNICAL_STRATEGY.md](./TECHNICAL_STRATEGY.md) for architecture
-- **Database Schema**: See [Docs/Database_Schema.md](./Docs/Database_Schema.md) for future Supabase setup
+**Read in this order based on your task:**
+
+1. **This file** (PROJECT_STRUCTURE.md) → Get oriented
+2. **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** ← Go here for detailed tasks
+3. **[TECHNICAL_STRATEGY.md](./TECHNICAL_STRATEGY.md)** ← Go here for architectural decisions
+4. **[CLAUDE.md](./CLAUDE.md)** ← Go here for development setup & guidelines
+5. **[Docs/](./Docs/)** ← Specific domain documentation (Database_Schema, PRD, UI specs)
+
+## 📖 Documentation Quick Links
+
+| Document | Purpose | When to Read |
+|----------|---------|-------------|
+| [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | ⭐ Source of truth for development | Planning work, assigning tasks |
+| [TECHNICAL_STRATEGY.md](./TECHNICAL_STRATEGY.md) | System architecture & design patterns | Understanding system design, making arch decisions |
+| [CLAUDE.md](./CLAUDE.md) | Development guidelines & project context | Setting up dev environment, understanding architecture |
+| [Docs/Database_Schema.md](./Docs/Database_Schema.md) | Database schema design | Working with Supabase, understanding data model |
+| [Docs/PRD.md](./Docs/PRD.md) | Product requirements | Understanding product vision |
+| [Docs/AUDIO_PIPELINE_INTEGRATION_PLAN.md](./Docs/AUDIO_PIPELINE_INTEGRATION_PLAN.md) | Recipe extraction details | Working on extraction pipeline |
 
 ## 🗑️ Archived Files
 
-Old completion reports, audits, and outdated plans are moved to `/Docs/Archive` for historical reference but are no longer actively used.
+Old completion reports, audits, and outdated plans are in `/Docs/Archive` for historical reference.
 
 ---
 
-**Last Updated**: December 24, 2025
-**Active Plan**: IMPLEMENTATION_PLAN.md (Phase 3 in progress)
+**Last Updated**: December 29, 2025
+**Status**: Phase 4 Complete ✅ (All phases finished)
+**Source of Truth**: [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)
