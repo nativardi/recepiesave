@@ -71,10 +71,10 @@ This project has connected MCP servers that provide enhanced capabilities. **Alw
 ### Essential Commands
 
 ```bash
-# Install dependencies
-npm install
+# Start all services (Next.js + Worker + Redis)
+npm run dev:all
 
-# Development server (http://localhost:3000)
+# Development server only (http://localhost:3000)
 npm run dev
 
 # Production build
@@ -91,12 +91,18 @@ npm run lint
 
 The app has two modes controlled by `NEXT_PUBLIC_DEV_MODE` in `.env.local`:
 
+**Unified Startup (Recommended):**
+```bash
+# Automatically detects mode and starts appropriate services
+npm run dev:all
+```
+
 **Dev Mode (no database/services required):**
 ```bash
 # Set in .env.local
 NEXT_PUBLIC_DEV_MODE=true
 
-# Just run Next.js
+# Just run Next.js (or use npm run dev:all)
 npm run dev
 ```
 
@@ -105,8 +111,12 @@ npm run dev
 # Set in .env.local
 NEXT_PUBLIC_DEV_MODE=false
 
+# Option 1: Use the unified command (recommended)
+npm run dev:all
+
+# Option 2: Manual startup (if you need individual control)
 # Terminal 1: Start Redis
-docker-compose up -d
+docker-compose up
 
 # Terminal 2: Start Python worker
 cd recipe-extraction
@@ -116,6 +126,8 @@ python recipe_worker.py
 # Terminal 3: Start Next.js
 npm run dev
 ```
+
+**Note:** The `npm run dev:all` command uses `concurrently` to intelligently start services based on your environment configuration. In production mode, it runs Redis, the Python worker, and Next.js with color-coded, prefixed logs for easy debugging.
 
 ## Architecture
 
@@ -335,6 +347,37 @@ The recipe extraction worker is in `recipe-extraction/`:
 - Maps unstructured AI output to structured database schema via `data_mapper.py`
 - Never modifies IG Downloader code (wrapper pattern)
 
+### Multilingual Recipe Extraction
+
+**Recipe extraction now auto-detects and preserves the original language:**
+
+- **Automatic Language Detection:** Detects Hebrew, Arabic, Chinese, Japanese, Korean, Russian, Thai, and other languages
+- **Language Preservation:** Extracts recipe data (title, ingredients, instructions) in the original language
+- **Spelling Correction:** Fixes spelling and grammar errors while preserving the language
+- **No Translation:** GPT explicitly instructed NOT to translate to English
+
+**Implementation Details:**
+- Location: `recipe-extraction/recipe_analyzer.py`
+- Function: `detect_transcript_language()` - Unicode-based language detection
+- System prompt: Updated to "multilingual culinary AI assistant"
+- Prompt instruction: Explicit "CRITICAL - LANGUAGE PRESERVATION" block added
+
+**Supported Languages (Auto-detected):**
+- Hebrew (עברית)
+- Arabic (العربية)
+- Chinese (中文)
+- Japanese (日本語)
+- Korean (한국어)
+- Russian (Русский)
+- Thai (ไทย)
+- All other Latin-script languages (Spanish, French, German, etc.)
+
+**Example:**
+```
+Hebrew video → Whisper transcribes → Language detected: "Hebrew"
+→ GPT extracts in Hebrew + fixes spelling → Recipe in Hebrew ✅
+```
+
 ## Testing Strategy
 
 - **Phase 1-3 complete**: All UI built, tested with mock data
@@ -391,6 +434,59 @@ When moving to production:
 - Use Upstash for Redis in production
 - Repositories automatically use Supabase instead of MockDataStore
 
+## Security Context
+
+This project has undergone security review. Understanding the security posture is critical for safe development.
+
+### Security Documentation
+
+- **[SECURITY_FINDINGS.md](./SECURITY_FINDINGS.md)** - Running log of all security findings
+- **[Docs/SECURITY.md](./Docs/SECURITY.md)** - Comprehensive security documentation
+- **[Docs/SECURITY_CHECKLIST.md](./Docs/SECURITY_CHECKLIST.md)** - Pre-production checklist
+
+### Current Security Posture
+
+**Status:** Early development, not production-ready
+
+**Key Points:**
+- **Dev Mode is safe** - Uses localStorage, no external services
+- **Production Mode has known issues** - Flask service lacks authentication
+- **Must-fix items documented** - 4 critical issues to address before any exposure
+
+### Attack Surface Overview
+
+| Component | Auth Status | Risk Level |
+|-----------|-------------|------------|
+| Next.js App | Supabase Auth + RLS | Low |
+| Flask Service (`extraction/`) | **None** | **High** |
+| Redis Queue | None (localhost only) | Medium |
+
+### Security Rules for Development
+
+1. **Never expose Flask service to the internet** without implementing API key auth first
+2. **Be careful with ngrok/tunnels** - they expose unauthenticated endpoints
+3. **Use dev mode** (`NEXT_PUBLIC_DEV_MODE=true`) for UI development to avoid risk
+4. **Validate all URLs** using hostname allowlists, not string matching
+5. **Don't log secrets** - check for console.log/print statements with sensitive data
+
+### Known Must-Fix Issues (Before Any Exposure)
+
+| Issue | Severity | File |
+|-------|----------|------|
+| Unauthenticated Flask APIs | Critical | `extraction/app.py` |
+| Flask debug mode on 0.0.0.0 | High | `extraction/app.py` |
+| Open CORS configuration | High | `extraction/app.py` |
+| Weak URL validation (SSRF) | High | `app/api/recipes/extract/route.ts` |
+
+See [SECURITY_FINDINGS.md](./SECURITY_FINDINGS.md) for detailed findings and recommended fixes.
+
+### When Making Security-Related Changes
+
+1. **Always read the file first** - Understand existing patterns
+2. **Update SECURITY_FINDINGS.md** - Mark items as resolved or add new findings
+3. **Follow existing patterns** - Repositories for data access, Supabase for auth
+4. **Never bypass authentication** - Even for "internal" endpoints
+
 ## Key Files to Review
 
 - `IMPLEMENTATION_PLAN.md` - Detailed phase-by-phase development plan
@@ -398,3 +494,5 @@ When moving to production:
 - `lib/repositories/RecipeRepository.ts` - Data access layer pattern
 - `lib/mocks/MockDataStore.ts` - Dev mode data store
 - `app/api/recipes/extract/route.ts` - Job submission endpoint
+- `SECURITY_FINDINGS.md` - Security findings and status
+- `Docs/SECURITY.md` - Full security documentation

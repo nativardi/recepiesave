@@ -25,6 +25,10 @@
         -   Identify **Cuisine** (e.g., Italian, Thai).
         -   Estimate **Prep/Cook Time**.
         -   Detect **Dietary Tags** (e.g., Vegetarian, Gluten-Free).
+    -   **Multilingual Support:**
+        -   Automatically detect language from transcript (Hebrew, Arabic, Chinese, Japanese, Korean, Russian, Thai, etc.)
+        -   Extract recipe data in original language (no unwanted translation)
+        -   Fix spelling/grammar errors while preserving language
 - **Storage:** Store structured recipe data (JSON), public URLs, and embeddings in Supabase.
 
 ### User-Facing Features

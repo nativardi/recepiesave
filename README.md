@@ -34,6 +34,8 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 - **[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)** - Project organization guide
 - **[TECHNICAL_STRATEGY.md](./TECHNICAL_STRATEGY.md)** - Technical architecture
 - **[Docs/](./Docs/)** - Additional documentation (PRD, UI specs, schema)
+- **[SECURITY_FINDINGS.md](./SECURITY_FINDINGS.md)** - Security audit findings
+- **[Docs/SECURITY.md](./Docs/SECURITY.md)** - Security documentation
 
 ## 🎯 Current Status
 

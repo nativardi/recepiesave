@@ -4,10 +4,42 @@ Extracts structured recipe data from transcripts.
 """
 import json
 import logging
+import re
 from typing import Dict, Optional
 from openai import OpenAI
 
 logger = logging.getLogger(__name__)
+
+
+def detect_transcript_language(text: str) -> str:
+    """
+    Simple language detection based on character sets.
+    Returns language name for use in prompts.
+    """
+    # Hebrew
+    if re.search(r'[\u0590-\u05FF]', text):
+        return "Hebrew"
+    # Arabic
+    if re.search(r'[\u0600-\u06FF]', text):
+        return "Arabic"
+    # Chinese
+    if re.search(r'[\u4E00-\u9FFF]', text):
+        return "Chinese"
+    # Japanese
+    if re.search(r'[\u3040-\u309F\u30A0-\u30FF]', text):
+        return "Japanese"
+    # Korean
+    if re.search(r'[\uAC00-\uD7AF]', text):
+        return "Korean"
+    # Cyrillic (Russian, Ukrainian, etc.)
+    if re.search(r'[\u0400-\u04FF]', text):
+        return "Russian"
+    # Thai
+    if re.search(r'[\u0E00-\u0E7F]', text):
+        return "Thai"
+
+    # Default to original language (English assumed for Latin script)
+    return "the original language"
 
 
 def extract_recipe_from_transcript(transcript: str, metadata: Optional[Dict] = None) -> Dict:
@@ -40,6 +72,10 @@ def extract_recipe_from_transcript(transcript: str, metadata: Optional[Dict] = N
 
         client = OpenAI()
 
+        # Detect language from transcript
+        detected_language = detect_transcript_language(transcript)
+        logger.info(f"Detected transcript language: {detected_language}")
+
         # Build context from metadata if available
         context = ""
         if metadata:
@@ -48,12 +84,24 @@ def extract_recipe_from_transcript(transcript: str, metadata: Optional[Dict] = N
             if metadata.get('description'):
                 context += f"Description: {metadata['description']}\n"
 
+        # Language preservation instruction
+        language_instruction = f"""
+CRITICAL - LANGUAGE PRESERVATION:
+- The transcript is in {detected_language}
+- Extract ALL text in {detected_language}: title, description, ingredients, instructions
+- Fix any spelling or grammar errors while preserving {detected_language}
+- Do NOT translate to English or any other language
+- Keep ingredient names, measurements, and all text in {detected_language}
+"""
+
         # Recipe extraction prompt
         prompt = f"""Extract recipe information from this cooking video transcript.
 
 {context}
 Transcript:
 {transcript}
+
+{language_instruction}
 
 Please analyze the transcript and extract recipe information in JSON format with this exact structure:
 
@@ -101,7 +149,7 @@ Respond with ONLY valid JSON, no additional text."""
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a culinary AI assistant specialized in extracting structured recipe data from video transcripts. Always respond with valid JSON only."
+                    "content": "You are a multilingual culinary AI assistant specialized in extracting structured recipe data from video transcripts in any language. Preserve the original language, fix spelling errors, and always respond with valid JSON only."
                 },
                 {"role": "user", "content": prompt}
             ],

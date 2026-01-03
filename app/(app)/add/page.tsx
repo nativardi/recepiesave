@@ -4,37 +4,28 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { UserCircle } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProcessingCard } from "@/components/composites/ProcessingCard";
-import { UrlCapture } from "@/components/composites/UrlCapture";
 import { getCurrentUser } from "@/lib/auth/get-user";
-import { recipeRepository } from "@/lib/repositories/RecipeRepository";
+import { RecipeRepository } from "@/lib/repositories/RecipeRepository";
 import { mockDataStore } from "@/lib/mocks/MockDataStore";
-import { Recipe } from "@/lib/types/database";
-import { User } from "lucide-react";
-
-const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
 type PageState = "input" | "processing" | "error";
 
-// Helper to detect platform
-function detectPlatform(url: string): Recipe["platform"] {
-  if (url.includes("tiktok.com")) return "tiktok";
-  if (url.includes("instagram.com")) return "instagram";
-  if (url.includes("youtube.com") || url.includes("youtu.be")) return "youtube";
-  if (url.includes("facebook.com")) return "facebook";
-  return "tiktok"; // Default
-}
-
 export default function AddRecipePage() {
   const router = useRouter();
+  const [urlInput, setUrlInput] = useState("");
   const [pageState, setPageState] = useState<PageState>("input");
   const [errorMessage, setErrorMessage] = useState("");
   const [progress, setProgress] = useState(0);
 
-  const handleSubmit = async (url: string) => {
-    if (!url) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!urlInput.trim()) {
       setErrorMessage("Please enter a URL");
       setPageState("error");
       return;
@@ -43,79 +34,109 @@ export default function AddRecipePage() {
     setPageState("processing");
     setProgress(0);
 
-    try {
-      if (isDevMode) {
-        // Dev mode: Use mock processing simulation
-        const user = await getCurrentUser();
-        const platform = detectPlatform(url);
+    let progressInterval: NodeJS.Timeout | null = null;
+    let navigationTimeout: NodeJS.Timeout | null = null;
+    const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
-        // Create recipe with pending status via mock repository
-        const newRecipe = await recipeRepository.create({
+    try {
+      const user = await getCurrentUser();
+
+      // Handle dev mode with MockDataStore
+      if (isDevMode) {
+        const recipeRepo = new RecipeRepository();
+
+        // Detect platform from URL
+        let platform: "tiktok" | "instagram" | "youtube" | "facebook" | null = null;
+        const urlLower = urlInput.toLowerCase();
+        if (urlLower.includes("tiktok.com") || urlLower.includes("vm.tiktok.com")) {
+          platform = "tiktok";
+        } else if (urlLower.includes("instagram.com")) {
+          platform = "instagram";
+        } else if (urlLower.includes("youtube.com") || urlLower.includes("youtu.be")) {
+          platform = "youtube";
+        } else if (urlLower.includes("facebook.com") || urlLower.includes("fb.watch")) {
+          platform = "facebook";
+        }
+
+        if (!platform) {
+          setErrorMessage("Unsupported platform. Only TikTok, Instagram, YouTube, and Facebook are supported.");
+          setPageState("error");
+          return;
+        }
+
+        // Create recipe in MockDataStore
+        const recipe = await recipeRepo.create({
           user_id: user.id,
-          original_url: url,
-          platform: platform,
-          status: "pending",
+          original_url: urlInput.trim(),
+          platform,
         });
 
-        // Start progress animation
-        const progressInterval = setInterval(() => {
-          setProgress((prev) => {
-            if (prev >= 95) {
-              clearInterval(progressInterval);
-              return 95;
-            }
-            return prev + 15;
-          });
-        }, 500);
+        // Start simulated processing asynchronously
+        mockDataStore.simulateRecipeProcessing(recipe.id, urlInput.trim());
 
-        // Simulate processing in background (non-blocking navigation)
-        mockDataStore.simulateRecipeProcessing(newRecipe.id, url);
-
-        // Wait for processing simulation to complete, then navigate
-        setTimeout(() => {
-          clearInterval(progressInterval);
-          setProgress(100);
-          router.push("/dashboard");
-        }, 4500);
-      } else {
-        // Production mode: Call the real API endpoint
-        const progressInterval = setInterval(() => {
+        // Simulate progress UI
+        progressInterval = setInterval(() => {
           setProgress((prev) => {
             if (prev >= 90) {
-              clearInterval(progressInterval);
+              if (progressInterval) clearInterval(progressInterval);
               return 90;
             }
             return prev + 10;
           });
-        }, 300);
-
-        const response = await fetch("/api/recipes/extract", {
-          method: "POST",
-          body: JSON.stringify({ url }),
-          headers: { "Content-Type": "application/json" },
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to start recipe extraction");
-        }
-
-        // Recipe extraction has started, navigate to dashboard
-        clearInterval(progressInterval);
-        setProgress(100);
-
-        // Short delay for UX smoothness
-        setTimeout(() => {
-          router.push("/dashboard");
         }, 500);
+
+        // Navigate after simulated processing completes (~4 seconds)
+        navigationTimeout = setTimeout(() => {
+          if (progressInterval) clearInterval(progressInterval);
+          setProgress(100);
+          router.push("/dashboard");
+        }, 4500);
+
+        return;
       }
+
+      // Production mode: use API endpoint
+      const response = await fetch("/api/recipes/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: urlInput.trim(),
+          user_id: user.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(data.error || "Failed to extract recipe");
+        setPageState("error");
+        return;
+      }
+
+      // Simulate progress
+      progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            if (progressInterval) clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 500);
+
+      // Wait a bit then navigate to dashboard
+      navigationTimeout = setTimeout(() => {
+        if (progressInterval) clearInterval(progressInterval);
+        setProgress(100);
+        router.push("/dashboard");
+      }, 3000);
     } catch (error) {
       console.error("Error:", error);
-      const message =
-        error instanceof Error ? error.message : "Something went wrong. Please try again.";
-      setErrorMessage(message);
+      setErrorMessage("Something went wrong. Please try again.");
       setPageState("error");
+      // Cleanup intervals on error
+      if (progressInterval) clearInterval(progressInterval);
+      if (navigationTimeout) clearTimeout(navigationTimeout);
     }
   };
 
@@ -139,7 +160,7 @@ export default function AddRecipePage() {
         title: "Add New Recipe",
         rightAction: (
           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-            <User size={24} className="text-charcoal" />
+            <UserCircle className="w-6 h-6 text-charcoal" />
           </div>
         ),
       }}
@@ -156,19 +177,33 @@ export default function AddRecipePage() {
             </p>
           </div>
 
-          {/* URL Capture - standalone variant */}
-          <UrlCapture
+          {/* Form */}
+          <form
             onSubmit={handleSubmit}
-            variant="standalone"
-            placeholder="Paste a TikTok or Instagram link..."
-            buttonLabel="Extract Recipe"
-            isLoading={false}
-          />
+            className="flex w-full max-w-sm flex-col gap-4"
+          >
+            <Input
+              type="text"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              placeholder="Paste a TikTok or Instagram link..."
+              className="h-14"
+            />
 
-          {/* Error State */}
-          {pageState === "error" && errorMessage && (
-            <div className="w-full max-w-sm flex flex-col gap-4">
+            {pageState === "error" && errorMessage && (
               <p className="text-accent text-sm text-center">{errorMessage}</p>
+            )}
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="h-14 w-full"
+            >
+              Extract Recipe
+            </Button>
+
+            {pageState === "error" && (
               <Button
                 type="button"
                 variant="ghost"
@@ -177,8 +212,8 @@ export default function AddRecipePage() {
               >
                 Try Again
               </Button>
-            </div>
-          )}
+            )}
+          </form>
 
           {/* Supported platforms */}
           <div className="flex flex-col items-center gap-2 text-muted text-sm">

@@ -2,236 +2,452 @@
 
 A centralized log of all security scan findings across the SaveIt Recipe App project. This document serves as a running TODO list for security issues discovered during development and code reviews.
 
-**Last Updated:** 2025-12-24
-**Total Findings:** 1 (1 High)
+**Last Updated:** 2025-12-30
+**Total Findings:** 11 (4 Critical/High - Must Fix Now, 7 Medium/Low - Deferred)
 **Resolved:** 0
-**Pending Review:** 1
+**Pending Review:** 11
 
 ---
 
 ## Status Summary
 
-| Severity | Count | Status |
+| Priority | Count | Status |
 |----------|-------|--------|
-| 🔴 HIGH | 1 | Pending |
-| 🟡 MEDIUM | 0 | - |
-| 🟢 LOW | 0 | - |
-| ✅ RESOLVED | 0 | - |
+| Must-Fix-Now | 4 | Pending |
+| Pre-Production | 7 | Deferred |
+| Resolved | 0 | - |
 
 ---
 
-## Finding Format
+## Finding Categories
 
-Each finding includes:
-- **Finding ID**: Unique identifier (FINDING-YYYY-MM-DD-N)
-- **Title**: Brief description
-- **Severity**: HIGH, MEDIUM, or LOW
-- **Category**: Type of vulnerability
-- **Status**: Pending, In Review, In Progress, Resolved
-- **File(s)**: Affected source files
-- **Description**: Detailed explanation
-- **Recommendation**: How to fix it
-- **Related Issues**: Links to related findings
-- **Date Discovered**: When this was found
-- **Date Resolved**: When/if this was fixed
-- **Notes**: Additional context and discussion
+### Must-Fix-Now (Development Blockers)
+Issues that can cause immediate harm if services are exposed, even during development.
+
+### Pre-Production (Deferred)
+Important issues that are acceptable during isolated development but must be fixed before production.
 
 ---
 
-## Active Findings
+## Must-Fix-Now Findings
 
-### FINDING-2025-12-24-001
+### FINDING-2025-12-30-001
 
-**Title:** Missing Authentication on API Endpoints
-**Severity:** 🔴 HIGH
+**Title:** Unauthenticated Flask APIs + Open CORS
+**Severity:** CRITICAL
 **Category:** Authentication & Authorization (CWE-306)
-**Status:** ⏳ Pending
-**Confidence:** 9/10
+**Status:** Pending
+**Priority:** Must-Fix-Now
 
 #### Files Affected
-- `Code Pojects/IG Downloader/app.py` (lines 62-331)
-- `Code Pojects/IG Downloader/legacy_routes.py`
+- `extraction/app.py` (lines 62-331)
+- `extraction/legacy_routes.py`
 
 #### Description
 
-All public API endpoints in the IG Downloader service lack authentication mechanisms:
+All public API endpoints in the Flask service lack authentication:
 - `POST /jobs/create` - Creates audio processing jobs
 - `GET /jobs/<job_id>/status` - Retrieves job status
-- `GET /jobs/<job_id>/result` - Retrieves complete job results with sensitive data
+- `GET /jobs/<job_id>/result` - Retrieves complete job results
 - `POST /api/v1/process` - SaveIt integration endpoint
 - `GET /api/v1/jobs/<job_id>` - SaveIt integration endpoint
+- `POST /download` - Legacy synchronous download
 
-This allows anonymous users to:
+Additionally, CORS is configured to allow all origins: `CORS(app)`
 
-1. **Consume API Credits Unauthorized:**
-   - Each job triggers 3 paid OpenAI API calls:
-     - Whisper transcription (~$0.006/minute)
-     - GPT-4.1-mini analysis (~$0.015/job)
-     - text-embedding-3-small (~$0.0001/job)
-   - No rate limiting on `/jobs/create` endpoint
-   - Attackers can submit unlimited jobs, rapidly depleting OpenAI API credits
+#### Impact
 
-2. **Access Other Users' Data:**
-   - No `user_id` column in database schema for job ownership
-   - Job IDs are UUIDs (128 bits) - hard to guess but enumerable
-   - Attackers can retrieve any job's transcripts, AI analysis, and audio file URLs
-   - Transcripts may contain sensitive or confidential information
+1. **Financial**: Unlimited OpenAI API credit consumption (~$0.02/job)
+2. **Privacy**: Unauthorized access to transcripts and analysis
+3. **Availability**: Storage exhaustion, queue flooding
 
-3. **Exhaust Resources:**
-   - Fill Supabase storage buckets (`temp-audio`, `thumbnails`) with malicious jobs
-   - Overwhelm Redis queue and worker processes
-   - No storage quota limits per user
-   - No automatic cleanup of failed/old jobs
-
-#### Exploit Scenario
+#### Evidence
 
 ```python
-# Attacker A: Resource abuse via automation
-import requests
-for i in range(10000):
-    response = requests.post(
-        'http://service/jobs/create',
-        json={'url': 'https://www.instagram.com/reel/ABC123/'}
-    )
-    job_id = response.json()['job_id']
-    # Cost: 10,000 jobs × $0.021/job = $210 in OpenAI credits consumed
+# extraction/app.py line 35
+CORS(app)  # Enable CORS for frontend
 
-# Attacker B: Data harvesting via UUID enumeration
-import uuid
-for job_uuid in [generate_uuid() for _ in range(100000)]:
-    response = requests.get(f'http://service/jobs/{job_uuid}/result')
-    if response.status_code == 200:
-        # Found a valid job - extract transcript, analysis, audio URLs
-        data = response.json()
-        print(f"Found job transcript: {data['result']['transcript']}")
+# extraction/app.py lines 62-106
+@app.route('/jobs/create', methods=['POST'])
+def create_job_endpoint():
+    # No authentication check
+    ...
 ```
 
-#### Current Implementation
+#### Recommendation
 
-No authentication found:
-- ❌ No API key validation
-- ❌ No JWT or OAuth2
-- ❌ No session management
-- ❌ No authentication decorators on endpoints
-- ❌ CORS enabled globally (`CORS(app)`)
-- ❌ No rate limiting middleware
-- ❌ No user/ownership association
+1. Add API key authentication decorator:
+```python
+from functools import wraps
 
-#### Recommendations
+def require_api_key(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        api_key = request.headers.get('X-API-Key')
+        if api_key != os.environ.get('FLASK_API_KEY'):
+            return jsonify({'error': 'Unauthorized'}), 401
+        return f(*args, **kwargs)
+    return decorated
+```
 
-**Priority 1 (Critical - Must implement before production):**
-1. Implement API key authentication:
-   ```python
-   from functools import wraps
+2. Apply to all endpoints:
+```python
+@app.route('/jobs/create', methods=['POST'])
+@require_api_key
+def create_job_endpoint():
+    ...
+```
 
-   def require_api_key(f):
-       @wraps(f)
-       def decorated_function(*args, **kwargs):
-           api_key = request.headers.get('X-API-Key')
-           if not api_key or not validate_api_key(api_key):
-               return jsonify({'error': 'Invalid or missing API key'}), 401
-           request.user_id = get_user_from_api_key(api_key)
-           return f(*args, **kwargs)
-       return decorated_function
+3. Restrict CORS:
+```python
+CORS(app, origins=['http://localhost:3000', os.environ.get('ALLOWED_ORIGIN', '')])
+```
 
-   @app.route('/jobs/create', methods=['POST'])
-   @require_api_key
-   def create_job_endpoint():
-       # Implementation
-   ```
+#### Estimated Fix Time: 30-45 minutes
 
-2. Update database schema to track job ownership:
-   ```sql
-   ALTER TABLE audio_jobs ADD COLUMN user_id UUID NOT NULL REFERENCES auth.users(id);
-   CREATE INDEX idx_audio_jobs_user_id ON audio_jobs(user_id);
-   ```
+---
 
-3. Enforce ownership validation in all endpoints:
-   ```python
-   job = get_job(job_id)
-   if job.user_id != request.user_id:
-       return jsonify({'error': 'Unauthorized'}), 403
-   ```
+### FINDING-2025-12-30-002
 
-**Priority 2 (High - Implement before wider deployment):**
-4. Implement rate limiting per user/API key:
-   ```python
-   from flask_limiter import Limiter
-   limiter = Limiter(
-       app=app,
-       key_func=lambda: request.headers.get('X-API-Key'),
-       default_limits=["100 per day", "10 per hour"]
-   )
-   ```
+**Title:** Flask Debug Mode on 0.0.0.0
+**Severity:** HIGH
+**Category:** Security Misconfiguration (CWE-489)
+**Status:** Pending
+**Priority:** Must-Fix-Now
 
-5. Add job quota limits:
-   ```python
-   user_job_count = count_jobs(user_id, created_after=today)
-   if user_job_count >= MAX_JOBS_PER_DAY:
-       return jsonify({'error': 'Job quota exceeded'}), 429
-   ```
+#### Files Affected
+- `extraction/app.py` (lines 334-337)
 
-6. Implement storage cleanup for old/failed jobs:
-   - Delete audio files after 7 days
-   - Remove failed jobs after 30 days
-   - Implement automatic cleanup scheduled task
+#### Description
 
-**Priority 3 (Medium - Hardening):**
-7. Restrict CORS to known origins instead of `CORS(app)`:
-   ```python
-   CORS(app, origins=['https://yourdomain.com', 'https://savethat.com'])
-   ```
+Flask runs with `debug=True` and binds to all network interfaces (`host='0.0.0.0'`).
 
-8. Implement comprehensive audit logging:
-   - Log all API requests with user_id and timestamp
-   - Track OpenAI API costs per user
-   - Monitor for suspicious patterns (rapid job creation, UUID enumeration)
+#### Impact
 
-9. Consider OAuth 2.0 / JWT for production:
-   - More secure token management
-   - Better integration with external services
-   - Support for delegated access
+- Debug mode exposes Werkzeug interactive debugger
+- Potential Remote Code Execution if debugger PIN is bypassed or leaked
+- Stack traces and application internals exposed on errors
 
-#### Impact Assessment
+#### Evidence
 
-| Aspect | Impact | Severity |
-|--------|--------|----------|
-| Financial | Unlimited OpenAI credit consumption | CRITICAL |
-| Privacy | Unauthorized access to user transcripts | CRITICAL |
-| Availability | Storage exhaustion, queue overflow | HIGH |
-| Reputation | Security breach, service abuse | HIGH |
+```python
+# extraction/app.py lines 334-337
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5001)
+```
 
-#### Related Issues
+#### Recommendation
 
-- None yet (first security scan)
+```python
+if __name__ == '__main__':
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    host = os.environ.get('FLASK_HOST', '127.0.0.1')
+    app.run(debug=debug, host=host, port=5001)
+```
 
-#### Notes
+#### Estimated Fix Time: 5 minutes
 
-- This service appears to be designed as a microservice component for integration into larger SaaS applications
-- Documentation mentions "embedding into external SaaS products" - may expect auth to be handled at API gateway level
-- However, the service should NOT assume external auth layer - it should implement its own
-- The lack of auth is appropriate for internal network deployment but NOT for public internet exposure
+---
 
-#### Date Discovered
+### FINDING-2025-12-30-003
 
-2025-12-24
+**Title:** Weak URL Validation - SSRF Risk
+**Severity:** HIGH
+**Category:** Server-Side Request Forgery (CWE-918)
+**Status:** Pending
+**Priority:** Must-Fix-Now
 
-#### Date Resolved
+#### Files Affected
+- `app/api/recipes/extract/route.ts` (lines 11-27)
+- `extraction/utils/platform_detector.py`
+- `extraction/utils/url_parser.py`
 
-Pending
+#### Description
 
-#### Resolution Checklist
+URL validation uses string `includes()` checks instead of hostname allowlists, allowing bypass attacks.
 
-- [ ] API key authentication implemented
-- [ ] Database schema updated with user_id
-- [ ] Ownership validation on all endpoints
-- [ ] Rate limiting configured
-- [ ] Job quota limits enforced
-- [ ] Storage cleanup implemented
-- [ ] CORS restricted to allowed origins
-- [ ] Audit logging implemented
-- [ ] Security tests written
-- [ ] Production deployment verified
+#### Impact
+
+- SSRF to internal services
+- Cloud metadata access (AWS/GCP/Azure)
+- Private network scanning
+
+#### Evidence
+
+```typescript
+// app/api/recipes/extract/route.ts lines 14-15
+if (url.includes("tiktok.com") || url.includes("vm.tiktok.com")) {
+    return "tiktok";
+}
+```
+
+#### Bypass Examples
+
+```
+https://tiktok.com@evil.com/video/123
+https://evil.com/?url=tiktok.com
+https://evil.tiktok.com.attacker.com/
+```
+
+#### Recommendation
+
+Create a centralized URL validation utility:
+
+```typescript
+// lib/utils/url-validation.ts
+const ALLOWED_HOSTS = new Set([
+  'instagram.com', 'www.instagram.com',
+  'tiktok.com', 'www.tiktok.com', 'vm.tiktok.com',
+  'youtube.com', 'www.youtube.com', 'youtu.be',
+  'facebook.com', 'www.facebook.com', 'fb.watch'
+]);
+
+export function isAllowedVideoUrl(urlString: string): boolean {
+  try {
+    const url = new URL(urlString);
+    if (url.protocol !== 'https:') return false;
+    if (url.username || url.password) return false; // Reject userinfo
+    return ALLOWED_HOSTS.has(url.hostname);
+  } catch {
+    return false;
+  }
+}
+```
+
+#### Estimated Fix Time: 1-2 hours
+
+---
+
+### FINDING-2025-12-30-004
+
+**Title:** Verbose Error Messages
+**Severity:** MEDIUM
+**Category:** Information Exposure (CWE-209)
+**Status:** Pending
+**Priority:** Must-Fix-Now (Quick Win)
+
+#### Files Affected
+- `extraction/app.py` (multiple error handlers)
+- `extraction/legacy_routes.py`
+
+#### Description
+
+Exception details are returned directly to clients via `str(e)`.
+
+#### Evidence
+
+```python
+# extraction/app.py line 106
+return jsonify({'error': str(e)}), 500
+```
+
+#### Recommendation
+
+```python
+except Exception as e:
+    logger.error(f"Failed to create job: {e}", exc_info=True)
+    return jsonify({'error': 'An internal error occurred. Please try again.'}), 500
+```
+
+#### Estimated Fix Time: 15 minutes
+
+---
+
+## Pre-Production Findings (Deferred)
+
+### FINDING-2025-12-30-005
+
+**Title:** Missing Rate Limiting
+**Severity:** MEDIUM
+**Category:** Denial of Service (CWE-770)
+**Status:** Deferred (Pre-Production)
+**Priority:** Pre-Production
+
+#### Files Affected
+- `extraction/app.py`
+- `app/api/recipes/extract/route.ts`
+
+#### Description
+
+No rate limiting on job creation endpoints allows resource exhaustion attacks.
+
+#### Recommendation
+
+Add Flask-Limiter:
+```python
+from flask_limiter import Limiter
+limiter = Limiter(app=app, key_func=lambda: request.headers.get('X-API-Key'))
+
+@app.route('/jobs/create', methods=['POST'])
+@limiter.limit("10 per hour")
+@require_api_key
+def create_job_endpoint():
+    ...
+```
+
+---
+
+### FINDING-2025-12-30-006
+
+**Title:** Redis Without Authentication
+**Severity:** MEDIUM
+**Category:** Missing Authentication (CWE-306)
+**Status:** Deferred (Pre-Production)
+**Priority:** Pre-Production
+
+#### Files Affected
+- `lib/extraction/queue.ts` (line 11)
+- `recipe-extraction/config.py`
+- `extraction/utils/config.py`
+
+#### Description
+
+Redis defaults to `redis://localhost:6379` without password or TLS.
+
+#### Evidence
+
+```typescript
+const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
+```
+
+#### Recommendation
+
+For production, require authenticated Redis:
+- Use password in URL: `redis://:password@host:port/0`
+- Use TLS: `rediss://...`
+- Fail closed if no auth on non-localhost connections
+
+---
+
+### FINDING-2025-12-30-007
+
+**Title:** Public Thumbnails Bucket
+**Severity:** LOW
+**Category:** Data Exposure (CWE-359)
+**Status:** Deferred (Pre-Production)
+**Priority:** Pre-Production
+
+#### Files Affected
+- `supabase/migrations/003_storage_buckets.sql`
+- `recipe-extraction/recipe_processor.py`
+
+#### Description
+
+Thumbnails bucket is publicly readable. URLs are predictable.
+
+#### Recommendation
+
+Evaluate if thumbnails need privacy. If yes, switch to signed URLs.
+
+---
+
+### FINDING-2025-12-30-008
+
+**Title:** RLS-Only Access Control on Status Route
+**Severity:** LOW
+**Category:** Authorization Bypass (CWE-863)
+**Status:** Deferred (Pre-Production)
+**Priority:** Pre-Production
+
+#### Files Affected
+- `app/api/recipes/[id]/status/route.ts`
+
+#### Description
+
+Status route relies solely on Supabase RLS without explicit user verification.
+
+#### Recommendation
+
+Add explicit user check:
+```typescript
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+const { data } = await supabase
+  .from('recipes')
+  .select('status')
+  .eq('id', recipeId)
+  .eq('user_id', user.id)  // Explicit ownership check
+  .single();
+```
+
+---
+
+### FINDING-2025-12-30-009
+
+**Title:** Unbounded Download Sizes
+**Severity:** MEDIUM
+**Category:** Resource Consumption (CWE-770)
+**Status:** Deferred (Pre-Production)
+**Priority:** Pre-Production
+
+#### Files Affected
+- `extraction/utils/audio_processor.py`
+- `extraction/utils/transcription_service.py`
+
+#### Description
+
+Video/audio downloads have no size limits, enabling DoS via large files.
+
+#### Recommendation
+
+- Check Content-Length header before download
+- Set max file size (e.g., 100MB)
+- Stream to temp files with hard limits
+- Use yt-dlp `--max-filesize` option
+
+---
+
+### FINDING-2025-12-30-010
+
+**Title:** SECURITY DEFINER Without search_path
+**Severity:** LOW
+**Category:** SQL Injection (CWE-89)
+**Status:** Deferred (Pre-Production)
+**Priority:** Pre-Production
+
+#### Files Affected
+- `supabase/migrations/001_initial_schema.sql`
+
+#### Description
+
+`handle_new_user()` function is SECURITY DEFINER but doesn't set `search_path`.
+
+#### Recommendation
+
+```sql
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  ...
+END;
+$$;
+```
+
+---
+
+### FINDING-2025-12-30-011
+
+**Title:** Service Role Key in Logs
+**Severity:** LOW
+**Category:** Sensitive Data Exposure (CWE-532)
+**Status:** Deferred (Pre-Production)
+**Priority:** Pre-Production
+
+#### Files Affected
+- `extraction/test_supabase_connection.py`
+
+#### Description
+
+Test script prints part of the service role key.
+
+#### Recommendation
+
+Remove or mask key logging completely.
 
 ---
 
@@ -243,143 +459,92 @@ Pending
 
 ## False Positives (Investigated & Dismissed)
 
-These were flagged during security review but determined to be false positives after detailed analysis.
-
 ### FP-2025-12-24-001: Command Injection in subprocess (DISMISSED)
 
-**Category:** Command Injection
-**Findings:** Subprocess call with user-controlled URL
-**Status:** ✅ Dismissed (Confidence: 2/10)
-
-**Reason:**
-- Uses `subprocess.run()` with list-based arguments (not `shell=True`)
-- URL validated against strict regex before subprocess call
-- Shell metacharacters not interpreted due to `shell=False`
-- No concrete exploit path exists
-
----
+**Status:** Dismissed (Confidence: 2/10)
+**Reason:** Uses `subprocess.run()` with list arguments (not `shell=True`). URL validated before use.
 
 ### FP-2025-12-24-002: Path Traversal in job_processor (DISMISSED)
 
-**Category:** Path Traversal
-**File:** `utils/job_processor.py:79-84`
-**Status:** ✅ Dismissed (Confidence: 1/10)
-
-**Reason:**
-- `job_id` is server-generated UUID, not user-controlled input
-- UUIDs cryptographically random and unguessable
-- Uses `os.path.join()` correctly (not string concatenation)
-- Per security guidelines: "UUIDs can be assumed to be unguessable and do not need to be validated"
-
----
+**Status:** Dismissed (Confidence: 1/10)
+**Reason:** `job_id` is server-generated UUID. Uses `os.path.join()` correctly.
 
 ### FP-2025-12-24-003: SSRF in transcription_service (DISMISSED)
 
-**Category:** Server-Side Request Forgery
-**File:** `utils/transcription_service.py:31-60`
-**Status:** ✅ Dismissed (Confidence: 2/10)
-
-**Reason:**
-- `audio_url` is system-generated by upload process, not user-controlled
-- URLs come from Supabase storage references or signed URLs
-- No API endpoint allows direct URL injection
-- No exploit path exists for attacker to control destination host/protocol
-
----
+**Status:** Dismissed (Confidence: 2/10)
+**Reason:** `audio_url` is system-generated from Supabase storage, not user-controlled.
 
 ### FP-2025-12-24-004: SSRF in audio_processor (DISMISSED)
 
-**Category:** Server-Side Request Forgery
-**File:** `utils/audio_processor.py:79-122`
-**Status:** ✅ Dismissed (Confidence: 2/10)
-
-**Reason:**
-- `video_url` extracted from yt-dlp metadata, not direct user input
-- yt-dlp validates and sanitizes URLs from social media platforms
-- Returns CDN URLs from legitimate platform CDNs only
-- No path to inject arbitrary host/protocol
-
----
+**Status:** Dismissed (Confidence: 2/10)
+**Reason:** `video_url` extracted from yt-dlp metadata, not direct user input.
 
 ### FP-2025-12-24-005: Information Disclosure via Errors (DISMISSED)
 
-**Category:** Data Exposure
-**Files:** Multiple error handlers
-**Status:** ✅ Dismissed (Confidence: 3/10)
-
-**Reason:**
-- Error messages do NOT expose API keys, credentials, or passwords
-- Error messages do NOT contain PII or user data
-- Only temporary file paths exposed (random, unpredictable)
-- Per guidelines: "Logging non-PII data is not a vulnerability"
-
----
+**Status:** Dismissed (Confidence: 3/10)
+**Reason:** Errors don't expose secrets or PII. Only temp file paths.
 
 ### FP-2025-12-24-006: Arbitrary File Write via ffmpeg (DISMISSED)
 
-**Category:** Input Validation
-**File:** `utils/audio_processor.py:184-192`
-**Status:** ✅ Dismissed (Confidence: 1/10)
-
-**Reason:**
-- All file paths generated using `tempfile` module (cryptographically secure)
-- Output paths use `tempfile.NamedTemporaryFile()` - random and unpredictable
-- Operations confined to OS temporary directories with proper permissions
-- No user input controls output path
-- `-y` flag is safe when used with secure temp paths
+**Status:** Dismissed (Confidence: 1/10)
+**Reason:** All paths use `tempfile` module. No user control over output paths.
 
 ---
 
 ## Methodology
 
 ### Scan Tool
-- Manual security code review by senior security engineer
-- Focus: HIGH and MEDIUM severity findings only
-- False positive filtering applied per security review guidelines
+- Manual security code review
+- Focus: Authentication, Authorization, Input Validation, SSRF, Configuration
 
 ### Scan Scope
-- IG Downloader project (multi-platform audio processing service)
-- Python backend code (Flask app, platform handlers, job processing)
-- Database migrations and schema
+- Next.js application and API routes
+- Flask service (IG Downloader)
+- Python recipe extraction worker
+- Supabase schema and RLS policies
+- Redis queue configuration
 
-### Exclusions
-- Denial of Service vulnerabilities
-- Secrets/credentials on disk (handled by separate process)
-- Rate limiting issues
-- Outdated third-party libraries
-- Memory safety issues
-- Log spoofing concerns
-- Regex injection/DOS
-- Documentation files (.md)
+### Prioritization Criteria
 
-### Confidence Scoring
-- 8.0-10.0: High confidence - actionable vulnerability
-- 7.0-7.9: Medium-high confidence - likely exploitable
-- 6.0-6.9: Medium confidence - needs investigation
-- Below 6.0: Dismissed as false positive/noise
+**Must-Fix-Now:**
+- Can cause immediate harm if services exposed
+- Low effort to fix (<1 hour)
+- High impact (financial, RCE, data exposure)
+
+**Pre-Production:**
+- Important but not immediately exploitable
+- Acceptable during isolated development
+- Required before real users access system
+
+---
+
+## Resolution Checklist (Must-Fix-Now)
+
+- [ ] SEC-001: API key authentication on Flask
+- [ ] SEC-001: CORS restriction
+- [ ] SEC-002: Flask debug mode fix
+- [ ] SEC-002: Bind to localhost by default
+- [ ] SEC-003: URL validation helper (TypeScript)
+- [ ] SEC-003: URL validation in Python
+- [ ] SEC-004: Sanitize error messages
 
 ---
 
 ## Next Steps
 
-1. **Review FINDING-2025-12-24-001** with team
-2. **Prioritize authentication implementation** before wider deployment
-3. **Schedule security testing** after fixes are implemented
-4. **Update this log** after each security scan or fix
+1. **Implement Must-Fix-Now items** (2-3 hours total)
+2. **Document fixes in this log**
+3. **Schedule Pre-Production fixes** before any deployment
+4. **Re-audit after fixes** to verify remediations
 
 ---
 
-## File Statistics
+## Related Documentation
 
-- **Total Security Findings:** 1
-- **HIGH Severity:** 1
-- **MEDIUM Severity:** 0
-- **LOW Severity:** 0
-- **False Positives Investigated:** 6
-- **Scan Confidence (average):** 9/10
+- [Docs/SECURITY.md](./Docs/SECURITY.md) - Full security documentation
+- [Docs/SECURITY_CHECKLIST.md](./Docs/SECURITY_CHECKLIST.md) - Actionable checklist
 
 ---
 
-**Last Security Scan:** 2025-12-24
-**Next Recommended Scan:** After authentication implementation (FINDING-2025-12-24-001)
-**Responsible Team:** Security Engineering
+**Last Security Audit:** 2025-12-30
+**Next Recommended Audit:** After Must-Fix-Now items resolved

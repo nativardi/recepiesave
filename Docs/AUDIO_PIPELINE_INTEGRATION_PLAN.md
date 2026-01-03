@@ -442,6 +442,7 @@ This is a **wrapper service** that reuses components from the IG Downloader
 - Recipe-specific AI analysis (GPT-4o-mini)
 - Ingredient parsing (quantity, unit, item)
 - Instruction extraction (step-by-step)
+- **Multilingual support:** Auto-detects language from transcript and extracts recipes in original language
 - Direct integration with RecipeSave database schema
 
 ## Files

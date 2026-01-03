@@ -4,6 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:all": "node scripts/start-all.js",
+    "dev:prod": "concurrently -n \"redis,worker,next\" -c \"blue,magenta,green\" \"npm:redis\" \"npm:worker\" \"npm:dev\"",
+    "redis": "docker-compose up",
+    "worker": "cd recipe-extraction && bash -c 'source ../extraction/venv/bin/activate && python recipe_worker.py'",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -28,6 +32,8 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0",
     "postcss": "^8.4.0",
