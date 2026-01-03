@@ -1,5 +1,5 @@
-// Description: Fixed bottom navigation component for authenticated app routes
-// Uses Lucide SVG icons for reliable rendering without font dependencies
+// Description: Modern bottom navigation with glassmorphism, floating FAB, and sliding indicator
+// Features: Next.js routing integration, smooth animations, accessibility support
 
 "use client";
 
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils/cn";
 import {
   Home,
   Search,
-  PlusCircle,
+  Plus,
   BookOpen,
   User,
   LucideIcon,
@@ -19,56 +19,95 @@ interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
+  isFab?: boolean;
 }
-
-const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Home", icon: Home },
-  { href: "/search", label: "Search", icon: Search },
-  { href: "/add", label: "Add", icon: PlusCircle },
-  { href: "/collections", label: "Cookbooks", icon: BookOpen },
-  { href: "/profile", label: "Profile", icon: User },
-];
 
 export function BottomNav() {
   const pathname = usePathname();
 
+  // All 5 nav items including Add in the center
+  const allNavItems = [
+    { href: "/dashboard", label: "Home", icon: Home },
+    { href: "/search", label: "Search", icon: Search },
+    { href: "/add", label: "Add", icon: Plus, isFab: true },
+    { href: "/collections", label: "Cookbooks", icon: BookOpen },
+    { href: "/profile", label: "Profile", icon: User },
+  ];
+
+  const activeIndex = allNavItems.findIndex((item) => pathname === item.href);
+
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-gray-200"
+      className="fixed bottom-0 left-0 right-0 z-50 pb-safe"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="flex justify-around items-center h-24 px-4 pb-2">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg",
-                isActive
-                  ? "text-primary"
-                  : "text-muted hover:text-charcoal"
-              )}
-              aria-label={item.label}
-              aria-current={isActive ? "page" : undefined}
+      <div className="mx-auto max-w-lg px-4 pb-6">
+        {/* Glass Navigation Bar */}
+        <div className="glass-nav relative rounded-3xl border border-border/50 shadow-2xl shadow-primary/5">
+          {/* Animated Sliding Indicator - centered under active icon */}
+          {activeIndex !== -1 && (
+            <div
+              className="absolute left-0 top-0 h-full transition-all duration-500 ease-out pointer-events-none"
+              style={{
+                width: `${100 / allNavItems.length}%`,
+                transform: `translateX(${activeIndex * 100}%)`,
+              }}
             >
-              <Icon
-                size={28}
-                strokeWidth={isActive ? 2.5 : 2}
-                className="shrink-0"
-              />
-              <span className={cn(
-                "text-xs",
-                isActive ? "font-bold" : "font-medium"
-              )}>{item.label}</span>
-            </Link>
-          );
-        })}
+              <div className="mx-auto mt-2 h-1 w-12 rounded-full bg-primary transition-all duration-300" />
+            </div>
+          )}
+
+          {/* Navigation Items */}
+          <div className="relative flex items-center justify-around px-4 py-3">
+            {allNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+              const isFab = item.isFab;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group relative flex flex-col items-center gap-1.5 transition-all duration-300"
+                  aria-label={item.label}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  {/* Icon Container - FAB is larger */}
+                  <div
+                    className={cn(
+                      "relative flex items-center justify-center rounded-full transition-all duration-300",
+                      isFab
+                        ? "h-14 w-14 bg-primary shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:scale-105"
+                        : "h-10 w-10"
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "transition-all duration-300",
+                        isFab
+                          ? "h-6 w-6 text-white"
+                          : isActive
+                            ? "h-6 w-6 text-primary"
+                            : "h-6 w-6 text-stone-600"
+                      )}
+                    />
+                  </div>
+
+                  {/* Label - always visible */}
+                  <span
+                    className={cn(
+                      "text-[10px] font-medium transition-colors duration-300",
+                      isActive ? "text-primary" : "text-stone-600"
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </nav>
   );

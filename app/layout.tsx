@@ -14,8 +14,12 @@ const urbanist = Urbanist({
 });
 
 export const metadata: Metadata = {
-  title: "SaveIt - Recipe Edition",
+  title: "Savory",
   description: "Turn social media recipes into your personal cookbook",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({

@@ -15,6 +15,8 @@ const buttonVariants = cva(
         primary: "bg-primary text-white hover:bg-primary-hover",
         secondary:
           "bg-surface border-2 border-primary text-primary hover:bg-primary/10",
+        outline:
+          "bg-surface border-2 border-gray-200 text-charcoal hover:bg-gray-50",
         ghost: "hover:bg-gray-100 text-charcoal",
         icon: "hover:bg-gray-100 text-charcoal",
       },
@@ -33,7 +35,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends Omit<HTMLMotionProps<"button">, "ref">,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

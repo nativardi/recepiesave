@@ -1,6 +1,6 @@
 <!-- Description: Defines the end-to-end technical build pipeline for SaveIt (Recipe Edition), including HTML→React conversion, component-library reuse philosophy, project structure, sequencing, quality gates, audio pipeline integration, and long-term maintenance methodology. -->
 
-# SaveIt (Recipe Edition) — Technical Strategy & Build Pipeline
+# Savory (Recipe Edition) — Technical Strategy & Build Pipeline
 
 ## 🎯 Purpose of This File
 

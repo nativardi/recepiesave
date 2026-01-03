@@ -1,4 +1,4 @@
-# SaveIt: Recipe Edition - User Interface Design Document
+# Savory - User Interface Design Document
 
 ## 1. Design Philosophy
 **"Modern Mise en place"** - The interface should be pristine, organized, and breathable. We move away from the "rustic" cookbook feel to a modern, digital culinary assistant. The background is white, lines are subtle, and typography is geometric and friendly (Urbanist). It feels like a high-end smart kitchen appliance.

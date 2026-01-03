@@ -1,4 +1,4 @@
-# SaveIt Recipe App - Implementation Plan
+# Savory Recipe App - Implementation Plan
 
 ## Current Status: Phase 4 COMPLETE ✅
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**SaveIt: Recipe Edition** - A Next.js app that extracts recipes from social media videos (TikTok, Instagram, YouTube, Facebook) using AI analysis. Converts video content into structured recipes with ingredients, instructions, and metadata.
+**Savory** - A Next.js app that extracts recipes from social media videos (TikTok, Instagram, YouTube, Facebook) using AI analysis. Converts video content into structured recipes with ingredients, instructions, and metadata.
 
 ## MCP Servers (Model Context Protocol)
 
@@ -376,6 +376,37 @@ The recipe extraction worker is in `recipe-extraction/`:
 ```
 Hebrew video → Whisper transcribes → Language detected: "Hebrew"
 → GPT extracts in Hebrew + fixes spelling → Recipe in Hebrew ✅
+```
+
+### Recipe Content Classification
+
+**Pre-extraction filtering ensures content is actually a recipe:**
+
+- **Classification Gate:** Before expensive extraction, quickly classify if content is recipe or not
+- **Early Exit:** Non-recipe content stops pipeline immediately with clear user message
+- **Cost Savings:** Avoids wasting API credits on food reviews, mukbangs, eating videos, etc.
+- **User Feedback:** Clear explanation when content doesn't qualify as a recipe
+
+**Implementation Details:**
+- Location: `recipe-extraction/recipe_analyzer.py`
+- Function: `classify_content(transcript)` - Lightweight GPT call analyzing first 1000 chars
+- Exception: `NotARecipeError` - Raised when content is classified as not a recipe
+- Classification: Binary decision ("RECIPE" or "NOT_RECIPE")
+- Error handling: Fails open (proceeds if classification errors)
+- Cost: ~$0.0001 per classification (10 tokens vs 2000 for full extraction)
+
+**What Qualifies as a Recipe:**
+- ✅ Cooking instructions
+- ✅ Ingredient lists
+- ✅ Food preparation steps
+- ❌ Restaurant reviews
+- ❌ Eating/mukbang videos
+- ❌ General food talk
+
+**Example:**
+```
+Video submitted → Whisper transcribes → classify_content() → "NOT_RECIPE"
+→ Raise NotARecipeError → Status: 'failed' → User sees clear message ✅
 ```
 
 ## Testing Strategy

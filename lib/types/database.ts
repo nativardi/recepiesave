@@ -20,6 +20,7 @@ export type Recipe = {
   user_id: string;
   original_url: string;
   platform: "tiktok" | "instagram" | "youtube" | "facebook";
+  creator_name: string | null;
   title: string;
   description: string | null;
   notes: string | null;

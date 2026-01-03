@@ -4,7 +4,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Updates the Supabase session and ensures user has a profile
+ * Updates the Supabase session (optimized for performance)
+ * Profile creation moved to useCurrentUser hook to avoid DB query on every navigation
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -34,37 +35,8 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Refresh session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Ensure profile exists for authenticated user
-  if (user) {
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("id", user.id)
-      .single();
-
-    // If profile doesn't exist, create it (workaround for trigger issue)
-    if (profileError && profileError.code === "PGRST116") {
-      const { error: insertError } = await supabase.from("profiles").insert({
-        id: user.id,
-        email: user.email || "",
-        full_name: user.user_metadata?.full_name || "",
-        avatar_url: user.user_metadata?.avatar_url || "",
-      });
-
-      if (insertError) {
-        console.error(
-          "Failed to create profile for user:",
-          user.id,
-          insertError
-        );
-      }
-    }
-  }
+  // Refresh session (minimal check for performance)
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }

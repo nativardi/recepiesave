@@ -1,4 +1,4 @@
-# SaveIt: Recipe Edition
+# Savory
 
 Turn social media recipes into your personal cookbook.
 

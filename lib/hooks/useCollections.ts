@@ -4,16 +4,19 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { collectionRepository } from "@/lib/repositories/CollectionRepository";
-import { getCurrentUser } from "@/lib/auth/get-user";
+import { useCurrentUser } from "./useCurrentUser";
 import { CollectionWithRecipes } from "@/lib/types/database";
 
 export function useCollections() {
+  const { data: user } = useCurrentUser();
+
   return useQuery<CollectionWithRecipes[], Error>({
-    queryKey: ["collections"],
+    queryKey: ["collections", user?.id],
     queryFn: async () => {
-      const user = await getCurrentUser();
+      if (!user) throw new Error("User not authenticated");
       return collectionRepository.getAllWithRecipes(user.id);
     },
+    enabled: !!user, // Only run query when user is available
   });
 }
 

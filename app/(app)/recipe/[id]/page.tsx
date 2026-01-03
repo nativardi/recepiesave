@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
@@ -12,11 +12,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { IngredientChecklistRow } from "@/components/composites/IngredientChecklistRow";
 import { InstructionStepCard } from "@/components/composites/InstructionStepCard";
 import { ErrorState } from "@/components/composites/ErrorState";
-import { recipeRepository } from "@/lib/repositories/RecipeRepository";
+import { useRecipeDetail } from "@/lib/hooks/useRecipeDetail";
 import { useToggleFavorite } from "@/lib/hooks/useToggleFavorite";
 import { useDeleteRecipe } from "@/lib/hooks/useDeleteRecipe";
 import { useToast } from "@/components/ui/toast";
-import { RecipeWithDetails } from "@/lib/types/database";
 import { cn } from "@/lib/utils/cn";
 import Image from "next/image";
 import { Heart, Share, Play, Pencil, Trash2 } from "lucide-react";
@@ -56,13 +55,11 @@ export default function RecipeDetailPage() {
   const params = useParams();
   const router = useRouter();
   const recipeId = params.id as string;
-  const [recipe, setRecipe] = useState<RecipeWithDetails | null>(null);
+  const { data: recipe, isLoading, error, refetch } = useRecipeDetail(recipeId);
   const [activeTab, setActiveTab] = useState("ingredients");
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(
     new Set()
   );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const toggleFavorite = useToggleFavorite();
@@ -71,9 +68,6 @@ export default function RecipeDetailPage() {
 
   const handleFavoriteClick = () => {
     if (!recipe) return;
-    const wasFavorite = recipe.is_favorite;
-    // Optimistically update local state
-    setRecipe({ ...recipe, is_favorite: !recipe.is_favorite });
     toggleFavorite.mutate(
       {
         recipeId: recipe.id,
@@ -81,11 +75,10 @@ export default function RecipeDetailPage() {
       },
       {
         onSuccess: () => {
-          showToast(wasFavorite ? "Removed from favorites" : "Added to favorites");
+          showToast(recipe.is_favorite ? "Removed from favorites" : "Added to favorites");
+          refetch(); // Refetch to get updated data
         },
         onError: () => {
-          // Revert optimistic update
-          setRecipe({ ...recipe, is_favorite: wasFavorite });
           showToast("Failed to update favorite", "error");
         },
       }
@@ -107,35 +100,13 @@ export default function RecipeDetailPage() {
     );
   };
 
-  const loadRecipe = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const recipeData = await recipeRepository.getByIdWithDetails(recipeId);
-      if (!recipeData) {
-        setError("Recipe not found.");
-      } else {
-        setRecipe(recipeData);
-      }
-    } catch (err) {
-      console.error("Failed to load recipe:", err);
-      setError("Failed to load this recipe. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [recipeId]);
-
-  useEffect(() => {
-    loadRecipe();
-  }, [loadRecipe]);
-
   // Error state
   if (error) {
     return (
       <AppShell topBar={{ title: "Recipe", showBack: true }}>
         <ErrorState
-          message={error}
-          onRetry={loadRecipe}
+          message={error instanceof Error ? error.message : "Failed to load this recipe. Please try again."}
+          onRetry={() => refetch()}
         />
       </AppShell>
     );
@@ -156,7 +127,7 @@ export default function RecipeDetailPage() {
       <AppShell topBar={{ title: "Recipe", showBack: true }}>
         <ErrorState
           message="Recipe not found."
-          onRetry={loadRecipe}
+          onRetry={() => refetch()}
         />
       </AppShell>
     );
@@ -240,9 +211,16 @@ export default function RecipeDetailPage() {
 
         {/* Title and Meta */}
         <div className="px-4">
-          <h1 className="text-4xl font-bold text-charcoal font-serif pt-6 pb-4">
+          <h1 className="text-4xl font-bold text-charcoal font-serif pt-6 pb-2">
             {recipe.title}
           </h1>
+
+          {/* Creator Name */}
+          {recipe.creator_name && (
+            <p className="text-base text-muted pb-4">
+              by {recipe.creator_name}
+            </p>
+          )}
 
           {/* Meta Tags */}
           <div className="flex gap-2 pb-6 overflow-x-auto scrollbar-hide">

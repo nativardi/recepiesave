@@ -186,7 +186,7 @@ export default function AddRecipePage() {
               type="text"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
-              placeholder="Paste a TikTok or Instagram link..."
+              placeholder="Paste link from TikTok, Instagram, YouTube..."
               className="h-14"
             />
 
@@ -214,6 +214,24 @@ export default function AddRecipePage() {
               </Button>
             )}
           </form>
+
+          <div className="relative w-full max-w-sm py-2">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted">Or</span>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-14 w-full max-w-sm border-2"
+            onClick={() => router.push("/recipe/create")}
+          >
+            Create Manually
+          </Button>
 
           {/* Supported platforms */}
           <div className="flex flex-col items-center gap-2 text-muted text-sm">

@@ -7,7 +7,7 @@ from typing import Dict, List
 logger = logging.getLogger(__name__)
 
 
-def map_recipe_to_database(recipe_data: Dict, recipe_id: str, user_id: str) -> Dict:
+def map_recipe_to_database(recipe_data: Dict, recipe_id: str, user_id: str, creator_name: str = None) -> Dict:
     """
     Map AI-extracted recipe data to database insert format.
 
@@ -15,6 +15,7 @@ def map_recipe_to_database(recipe_data: Dict, recipe_id: str, user_id: str) -> D
         recipe_data: Output from recipe_analyzer.extract_recipe_from_transcript()
         recipe_id: UUID string of the recipe record
         user_id: UUID string of the user who created the recipe
+        creator_name: Content creator's username from the platform
 
     Returns:
         {
@@ -28,6 +29,7 @@ def map_recipe_to_database(recipe_data: Dict, recipe_id: str, user_id: str) -> D
     recipe_update = {
         "title": recipe_data.get("title", "Untitled Recipe"),
         "description": recipe_data.get("description", ""),
+        "creator_name": creator_name,
         "prep_time_minutes": recipe_data.get("prep_time_minutes"),
         "cook_time_minutes": recipe_data.get("cook_time_minutes"),
         "servings": recipe_data.get("servings"),

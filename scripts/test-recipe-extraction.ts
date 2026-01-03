@@ -126,7 +126,7 @@ async function testRecipeExtraction(testUrl: string) {
 
       const { data: statusData, error: statusError } = await supabase
         .from('recipes')
-        .select('status, title, description')
+        .select('status, title, description, error_message')
         .eq('id', recipeId)
         .single();
 
@@ -147,6 +147,15 @@ async function testRecipeExtraction(testUrl: string) {
           break;
         } else if (currentStatus === 'failed') {
           console.log('\n❌ Recipe extraction failed');
+          if (statusData.error_message) {
+            // Check if it's a "not a recipe" error
+            if (statusData.error_message.includes('does not contain recipe content')) {
+              console.log('\n🚫 NOT A RECIPE:');
+              console.log(`   ${statusData.error_message}`);
+            } else {
+              console.log(`   Error: ${statusData.error_message}`);
+            }
+          }
           break;
         }
       }

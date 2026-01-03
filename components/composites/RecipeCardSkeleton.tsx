@@ -17,7 +17,7 @@ export function RecipeCardSkeleton({ className }: RecipeCardSkeletonProps) {
       )}
     >
       {/* Thumbnail skeleton */}
-      <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-gray-200 animate-pulse">
+      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-200 animate-pulse">
         {/* Video indicator placeholder */}
         <div className="absolute top-2 right-2 w-8 h-8 bg-gray-300 rounded-full" />
         {/* Cook time placeholder */}

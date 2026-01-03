@@ -147,7 +147,7 @@ class FacebookHandler(BasePlatformHandler):
         """Return human-readable platform name."""
         return "Facebook"
 
-    def download_video(self, url: str, output_path: str) -> str:
+    def download_video(self, url: str, output_path: str, metadata: Optional[Dict] = None) -> str:
         """
         Download Facebook Reel via yt-dlp using the same configuration as metadata fetch.
 

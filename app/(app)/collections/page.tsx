@@ -11,7 +11,7 @@ import { getCurrentUser } from "@/lib/auth/get-user";
 import { collectionRepository } from "@/lib/repositories/CollectionRepository";
 import { CollectionWithRecipes } from "@/lib/types/database";
 import { EmptyState } from "@/components/composites/EmptyState";
-import { Plus, User, BookOpen } from "lucide-react";
+import { Plus, User } from "lucide-react";
 
 // Skeleton component for collection cards
 function CollectionCardSkeleton() {
@@ -65,14 +65,6 @@ export default function CollectionsPage() {
         title: "Cookbooks",
         rightAction: (
           <div className="flex items-center gap-4">
-            <button
-              onClick={handleCreateCookbook}
-              className="flex items-center justify-center size-10 rounded-full bg-surface text-accent shadow-sm hover:bg-gray-50 transition-colors"
-              aria-label="Create New Cookbook"
-              tabIndex={0}
-            >
-              <Plus size={20} />
-            </button>
             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
               <User size={20} className="text-charcoal" />
             </div>
@@ -89,25 +81,6 @@ export default function CollectionsPage() {
           <p className="text-base text-muted">
             Organize your saved recipes into custom cookbooks.
           </p>
-        </div>
-
-        {/* Create New Cookbook Button */}
-        <div className="w-full">
-          <button
-            onClick={handleCreateCookbook}
-            className="flex w-full items-center gap-4 rounded-xl bg-surface p-4 shadow-sm border border-gray-200 active:scale-[0.98] transition-transform hover:bg-gray-50"
-            tabIndex={0}
-          >
-            <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <BookOpen size={24} />
-            </div>
-            <div className="flex flex-col items-start text-left">
-              <span className="text-lg font-bold text-charcoal font-serif">
-                Create New Cookbook
-              </span>
-              <span className="text-sm text-muted">Curate a new collection</span>
-            </div>
-          </button>
         </div>
 
         {/* Error State */}
@@ -130,12 +103,24 @@ export default function CollectionsPage() {
         {/* Collections Grid */}
         {!isLoading && !error && (
           <div className="grid grid-cols-2 gap-4 pb-4">
+            {/* Create Card - Always First */}
+            <button
+              onClick={handleCreateCookbook}
+              className="relative flex flex-col items-center justify-center gap-2 aspect-square rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-orange-50 hover:border-orange-300 hover:text-orange-600 text-gray-400 transition-all group"
+              aria-label="Create New Cookbook"
+            >
+              <div className="p-2 rounded-full bg-white group-hover:bg-orange-100 transition-colors">
+                <Plus size={24} className="group-hover:text-orange-600 transition-colors" />
+              </div>
+              <span className="font-medium text-sm">New Cookbook</span>
+            </button>
+
             {collections.length > 0 ? (
               collections.map((collection) => (
                 <CollectionCard key={collection.id} collection={collection} />
               ))
             ) : (
-              <div className="col-span-2">
+              <div className="col-span-1">
                 <EmptyState
                   variant="collections"
                   actionLabel="Create Cookbook"

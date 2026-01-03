@@ -9,6 +9,7 @@ interface AppShellProps {
   children: ReactNode;
   topBar?: {
     title?: string;
+    logoSrc?: string;
     showBack?: boolean;
     rightAction?: ReactNode;
   };
@@ -21,6 +22,7 @@ export function AppShell({ children, topBar }: AppShellProps) {
       {topBar && (
         <TopBar
           title={topBar.title}
+          logoSrc={topBar.logoSrc}
           showBack={topBar.showBack}
           rightAction={topBar.rightAction}
         />

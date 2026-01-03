@@ -168,6 +168,7 @@ class MockDataStore {
       user_id: data.user_id,
       original_url: data.original_url,
       platform: data.platform,
+      creator_name: null,
       title: "Processing...",
       description: null,
       notes: null,

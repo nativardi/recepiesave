@@ -11,6 +11,60 @@ from openai import OpenAI
 logger = logging.getLogger(__name__)
 
 
+class NotARecipeError(Exception):
+    """Raised when content is not a recipe"""
+    pass
+
+
+def classify_content(transcript: str) -> bool:
+    """
+    Quickly classify if transcript contains recipe content.
+    Returns True if recipe, False otherwise.
+
+    This is a lightweight pre-check to avoid expensive extraction
+    on non-recipe content.
+    """
+    try:
+        client = OpenAI()
+
+        # Lightweight classification prompt
+        prompt = f"""Is the following transcript from a cooking/recipe video?
+
+Transcript:
+{transcript[:1000]}  # Use first 1000 chars for speed
+
+Respond with ONLY one word: "RECIPE" or "NOT_RECIPE"
+
+Classification rules:
+- RECIPE: Contains cooking instructions, ingredients, food preparation
+- NOT_RECIPE: General food talk, restaurant reviews, eating videos, non-food content
+
+Your response (one word only):"""
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a content classifier. Respond with only RECIPE or NOT_RECIPE."
+                },
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.0,  # Deterministic
+            max_tokens=10  # Just need one word
+        )
+
+        classification = response.choices[0].message.content.strip().upper()
+        is_recipe = "RECIPE" in classification
+
+        logger.info(f"Content classification: {'RECIPE' if is_recipe else 'NOT_RECIPE'}")
+        return is_recipe
+
+    except Exception as e:
+        logger.warning(f"Classification failed, assuming recipe: {e}")
+        return True  # Fail open - proceed if classification errors
+
+
 def detect_transcript_language(text: str) -> str:
     """
     Simple language detection based on character sets.
@@ -69,6 +123,14 @@ def extract_recipe_from_transcript(transcript: str, metadata: Optional[Dict] = N
     """
     try:
         logger.info(f"Extracting recipe from transcript (length: {len(transcript)} chars)")
+
+        # Step 1: Classify content - is this actually a recipe?
+        if not classify_content(transcript):
+            logger.warning("Content classified as NOT a recipe - aborting extraction")
+            raise NotARecipeError(
+                "This video does not contain recipe content. "
+                "Please submit a video with cooking instructions and ingredients."
+            )
 
         client = OpenAI()
 
@@ -138,7 +200,6 @@ Guidelines:
 - Estimate prep/cook time if not explicitly stated
 - Cuisine should be one of: Italian, Mexican, Chinese, Japanese, Thai, Indian, French, American, Mediterranean, or "Other"
 - Dietary tags: vegetarian, vegan, gluten-free, dairy-free, keto, paleo, etc.
-- If this is NOT a recipe (e.g., just talking about food), set title to "Not a recipe" and leave other fields minimal
 
 Respond with ONLY valid JSON, no additional text."""
 
@@ -182,11 +243,6 @@ Respond with ONLY valid JSON, no additional text."""
             if field not in recipe_data:
                 logger.error(f"Missing required field '{field}' in AI response")
                 raise ValueError(f"AI response missing required field: {field}")
-
-        # Validate it's actually a recipe
-        if recipe_data.get('title', '').lower() == 'not a recipe':
-            logger.warning("Content is not a recipe")
-            raise ValueError("Video does not contain recipe content")
 
         # Set defaults for optional fields
         recipe_data.setdefault('description', '')

@@ -2,14 +2,20 @@
 
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProgressBar } from "@/components/primitives/ProgressBar";
 import { CookModeControls } from "@/components/composites/CookModeControls";
+import { IngredientChecklistRow } from "@/components/composites/IngredientChecklistRow";
 import { Button } from "@/components/ui/button";
 import { recipeRepository } from "@/lib/repositories/RecipeRepository";
-import { RecipeWithDetails } from "@/lib/types/database";
+import { RecipeWithDetails, Ingredient } from "@/lib/types/database";
+import {
+  findIngredientsInInstruction,
+  augmentInstructionWithQuantities,
+  MatchedIngredient,
+} from "@/lib/utils/ingredientMatcher";
 import Image from "next/image";
 import {
   Sun,
@@ -31,6 +37,9 @@ export default function CookModePage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0); // -1 for prev, 1 for next
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(
+    new Set()
+  );
 
   // Timer state
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -149,6 +158,48 @@ export default function CookModePage() {
     router.push(`/recipe/${recipeId}`);
   };
 
+  // Get current step info (safe to use before recipe check)
+  const instructions = recipe?.instructions ?? [];
+  const currentStep = instructions[currentStepIndex];
+  const totalSteps = instructions.length;
+  const progress =
+    totalSteps > 0 ? ((currentStepIndex + 1) / totalSteps) * 100 : 0;
+
+  // Match ingredients for the current step (hooks must be called unconditionally)
+  const matchedIngredients = useMemo(() => {
+    if (!currentStep || !recipe?.ingredients?.length) return [];
+    return findIngredientsInInstruction(
+      currentStep.text,
+      recipe.ingredients
+    );
+  }, [currentStep, recipe?.ingredients]);
+
+  // Augment instruction text with ingredient quantities
+  const augmentedTextSegments = useMemo(() => {
+    if (!currentStep) return [];
+    return augmentInstructionWithQuantities(
+      currentStep.text,
+      matchedIngredients
+    );
+  }, [currentStep, matchedIngredients]);
+
+  // Handle ingredient toggle
+  const handleIngredientToggle = useCallback(
+    (ingredientId: string, checked: boolean) => {
+      setCheckedIngredients((prev) => {
+        const next = new Set(prev);
+        if (checked) {
+          next.add(ingredientId);
+        } else {
+          next.delete(ingredientId);
+        }
+        return next;
+      });
+    },
+    []
+  );
+
+  // Loading state - MUST come after all hooks
   if (!recipe) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -161,12 +212,6 @@ export default function CookModePage() {
       </div>
     );
   }
-
-  const instructions = recipe.instructions;
-  const currentStep = instructions[currentStepIndex];
-  const totalSteps = instructions.length;
-  const progress =
-    totalSteps > 0 ? ((currentStepIndex + 1) / totalSteps) * 100 : 0;
 
   if (instructions.length === 0) {
     return (
@@ -297,13 +342,12 @@ export default function CookModePage() {
             {instructions.map((_, index) => (
               <motion.div
                 key={index}
-                className={`h-1.5 flex-1 rounded-full ${
-                  index === currentStepIndex
-                    ? "bg-primary"
-                    : completedSteps.has(index)
-                      ? "bg-green-500"
-                      : "bg-gray-200"
-                }`}
+                className={`h-1.5 flex-1 rounded-full ${index === currentStepIndex
+                  ? "bg-primary"
+                  : completedSteps.has(index)
+                    ? "bg-green-500"
+                    : "bg-gray-200"
+                  }`}
                 initial={false}
                 animate={{
                   scale: index === currentStepIndex ? 1 : 0.95,
@@ -350,13 +394,43 @@ export default function CookModePage() {
               )}
 
               {/* Text Content */}
-              <div className="p-6 flex flex-col gap-3 overflow-y-auto">
-                <h3 className="text-xl font-bold text-charcoal leading-tight">
-                  {currentStep.text.split(".")[0]}.
+              <div className="p-6 flex flex-col gap-4 overflow-y-auto">
+                {/* Step Header - No longer duplicating content */}
+                <h3 className="text-lg font-bold text-primary uppercase tracking-wide">
+                  Step {currentStepIndex + 1}
                 </h3>
-                <p className="text-lg text-charcoal/80 leading-relaxed">
-                  {currentStep.text}
+
+                {/* Instruction Text with Ingredient Quantities */}
+                <p className="text-lg text-charcoal leading-relaxed">
+                  {augmentedTextSegments.map((segment, idx) =>
+                    segment.isBold ? (
+                      <strong key={idx} className="text-primary font-bold">
+                        {segment.text}
+                      </strong>
+                    ) : (
+                      <span key={idx}>{segment.text}</span>
+                    )
+                  )}
                 </p>
+
+                {/* Relevant Ingredients Checklist */}
+                {matchedIngredients.length > 0 && (
+                  <div className="mt-2 space-y-2">
+                    <p className="text-sm font-semibold text-muted uppercase tracking-wide">
+                      Ingredients for this step
+                    </p>
+                    {matchedIngredients.map(({ ingredient }) => (
+                      <IngredientChecklistRow
+                        key={ingredient.id}
+                        ingredient={ingredient}
+                        checked={checkedIngredients.has(ingredient.id)}
+                        onToggle={(checked) =>
+                          handleIngredientToggle(ingredient.id, checked)
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>

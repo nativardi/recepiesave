@@ -17,6 +17,22 @@
     --color-charcoal: 61 64 91; /* #3D405B */
     --color-muted: 120 113 108; /* #78716c Stone-500 */
     --color-accent: 239 68 68; /* #ef4444 Red-500 */
+
+    /* Culinary Atelier palette - for ProcessingIndicator */
+    --culinary-terracotta: 212 116 94; /* #D4745E */
+    --culinary-cream: 250 247 242; /* #FAF7F2 */
+    --culinary-linen: 245 239 231; /* #F5EFE7 */
+    --culinary-border: 232 220 200; /* #E8DCC8 */
+    --culinary-charcoal: 44 36 22; /* #2C2416 */
+    --culinary-text-muted: 107 94 82; /* #6B5E52 */
+    --culinary-sage: 139 168 136; /* #8BA888 */
+  }
+
+  /* Configure font families */
+  * {
+    font-feature-settings: "kern" 1, "liga" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Dark mode */
@@ -42,5 +58,18 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Glassmorphism effect for bottom navigation */
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .dark .glass-nav {
+    background: rgba(38, 38, 38, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 }

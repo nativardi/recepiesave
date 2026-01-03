@@ -6,11 +6,17 @@ import { Recipe } from "@/lib/types/database";
 import { cn } from "@/lib/utils/cn";
 import { useToggleFavorite } from "@/lib/hooks/useToggleFavorite";
 import { useToast } from "@/components/ui/toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { recipeRepository } from "@/lib/repositories/RecipeRepository";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Video, Timer, Heart, Utensils } from "lucide-react";
-import { memo } from "react";
+import { memo, useCallback } from "react";
+import { RecipeCardSkeleton } from "./RecipeCardSkeleton";
+
+// Generic gray placeholder for blur effect
+const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -20,6 +26,16 @@ interface RecipeCardProps {
 function RecipeCardComponent({ recipe, className }: RecipeCardProps) {
   const toggleFavorite = useToggleFavorite();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Prefetch recipe details on hover - masks ~300ms latency
+  const handlePrefetch = useCallback(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["recipe", recipe.id],
+      queryFn: () => recipeRepository.getByIdWithDetails(recipe.id),
+      staleTime: 5 * 60 * 1000, // Match global staleTime
+    });
+  }, [queryClient, recipe.id]);
 
   const getCookTime = () => {
     if (recipe.prep_time_minutes && recipe.cook_time_minutes) {
@@ -52,26 +68,47 @@ function RecipeCardComponent({ recipe, className }: RecipeCardProps) {
     );
   };
 
+  if (recipe.status === "processing" || recipe.title === "Processing...") {
+    return (
+      <div className="relative w-full h-full">
+        <RecipeCardSkeleton />
+        <div className="absolute bottom-4 left-4 bg-white/90 px-2 py-1 rounded text-xs font-medium text-orange-600 shadow-sm backdrop-blur-sm z-20">
+          Extracting...
+        </div>
+      </div>
+    );
+  }
+
   const cookTime = getCookTime();
 
   return (
     <Link
       href={`/recipe/${recipe.id}`}
+      onMouseEnter={handlePrefetch}
+      onFocus={handlePrefetch}
       className={cn(
         "group flex flex-col bg-surface rounded-2xl p-2 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
         className
       )}
       aria-label={`View recipe: ${recipe.title}`}
     >
-      <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-gray-100">
+      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-100">
         {recipe.thumbnail_url ? (
-          <Image
-            src={recipe.thumbnail_url}
-            alt={recipe.title}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-            sizes="(max-width: 768px) 50vw, 33vw"
-          />
+          <>
+            <Image
+              src={recipe.thumbnail_url}
+              alt={recipe.title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              sizes="(max-width: 768px) 50vw, 33vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              loading="lazy"
+            />
+            {/* Contrast Gradients */}
+            <div className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+          </>
         ) : (
           <div className="h-full w-full flex items-center justify-center bg-gray-100">
             <Utensils size={32} className="text-gray-400" />
@@ -83,7 +120,7 @@ function RecipeCardComponent({ recipe, className }: RecipeCardProps) {
           onClick={handleFavoriteClick}
           whileTap={{ scale: 0.85 }}
           className={cn(
-            "absolute top-2 left-2 rounded-full p-1.5 flex items-center justify-center shadow-sm transition-all duration-200",
+            "absolute top-2 left-2 rounded-full p-1.5 flex items-center justify-center shadow-sm transition-all duration-200 z-10",
             recipe.is_favorite
               ? "bg-accent text-white"
               : "bg-black/30 backdrop-blur-md text-white hover:bg-accent/80"
@@ -109,25 +146,23 @@ function RecipeCardComponent({ recipe, className }: RecipeCardProps) {
         </motion.button>
 
         {/* Video indicator */}
-        <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm">
+        <div className="absolute top-2 right-2 bg-black/30 backdrop-blur-md rounded-full p-1.5 flex items-center justify-center shadow-sm z-10">
           <Video size={18} className="text-white" />
         </div>
-
-        {/* Cook time badge */}
-        {cookTime && (
-          <div className="absolute bottom-2 left-2 bg-black/30 backdrop-blur-md rounded-full px-2 py-1 flex items-center gap-1 shadow-sm">
-            <Timer size={12} className="text-white" />
-            <span className="text-white text-xs font-bold tracking-wide">
-              {cookTime}
-            </span>
-          </div>
-        )}
       </div>
 
-      <div className="px-1 pt-3 pb-1">
-        <h3 className="text-charcoal text-sm font-bold leading-tight line-clamp-2">
+      <div className="px-1 pt-3 pb-1 space-y-1">
+        <h3
+          className="text-charcoal text-sm font-bold leading-tight line-clamp-2"
+          dir="auto"
+        >
           {recipe.title}
         </h3>
+        {recipe.creator_name && (
+          <p className="text-xs text-muted truncate">
+            {recipe.creator_name}
+          </p>
+        )}
       </div>
     </Link>
   );

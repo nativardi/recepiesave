@@ -218,7 +218,7 @@ def process_recipe_extraction(recipe_id: str, url: str, user_id: str) -> Dict:
         logger.info(f"Recipe extracted: {recipe_data['title']}")
 
         # Step 7: Map to database schema (RecipeSave - Custom)
-        mapped_data = map_recipe_to_database(recipe_data, recipe_id, user_id)
+        mapped_data = map_recipe_to_database(recipe_data, recipe_id, user_id, creator_name=uploader)
 
         # Step 8: Store in database
         # Update recipe

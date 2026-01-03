@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { UrlCapture } from "@/components/composites/UrlCapture";
 import { SectionHeader } from "@/components/composites/SectionHeader";
@@ -10,11 +10,15 @@ import { RecipeCarousel } from "@/components/composites/RecipeCarousel";
 import { RecipeGrid } from "@/components/composites/RecipeGrid";
 import { RecipeGridSkeleton } from "@/components/composites/RecipeGridSkeleton";
 import { ErrorState } from "@/components/composites/ErrorState";
-import { getCurrentUser } from "@/lib/auth/get-user";
+import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
+import { useRecipes } from "@/lib/hooks/useRecipes";
+import { useRecipeProcessing } from "@/lib/hooks/useRecipeProcessing";
 import { recipeRepository } from "@/lib/repositories/RecipeRepository";
+import { mockDataStore } from "@/lib/mocks/MockDataStore";
 import { Recipe } from "@/lib/types/database";
 import { cn } from "@/lib/utils/cn";
 import { User, Heart } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type FilterView = "all" | "favorites";
 type PlatformFilter = "all" | "tiktok" | "instagram" | "youtube" | "facebook";
@@ -29,68 +33,86 @@ function detectPlatform(url: string): Recipe["platform"] {
 }
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<{ full_name: string | null; id: string } | null>(null);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+  const { data: user, isLoading: userLoading, error: userError } = useCurrentUser();
+  const { data: recipesData, isLoading: recipesLoading, error: recipesError, refetch } = useRecipes();
   const [createError, setCreateError] = useState<string | null>(null);
   const [filterView, setFilterView] = useState<FilterView>("all");
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("all");
+  const queryClient = useQueryClient();
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-      const userRecipes = await recipeRepository.getAll(currentUser.id);
-      setRecipes(
-        [...userRecipes].sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-      );
-    } catch (err) {
-      console.error("Failed to load recipes:", err);
-      setError("Failed to load your recipes. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  // Processing state management
+  const { processingState, startProcessing, setError: setProcessingError } = useRecipeProcessing({
+    onComplete: () => {
+      // Refetch recipes when processing completes
+      refetch();
+    },
+    onError: (error) => {
+      setCreateError(error);
+    },
+  });
 
+  const isLoading = userLoading || recipesLoading;
+  const error = userError || recipesError;
+
+  // Sort recipes by creation date (most recent first)
+  const recipes = useMemo(() => {
+    if (!recipesData) return [];
+    return [...recipesData].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+  }, [recipesData]);
+
+  // Auto-prefetch first 6 recipes (visible in viewport)
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (!recipes || recipes.length === 0) return;
+
+    // Prefetch top 6 recipes
+    const visibleRecipes = recipes.slice(0, 6);
+
+    visibleRecipes.forEach((recipe) => {
+      queryClient.prefetchQuery({
+        queryKey: ["recipe", recipe.id],
+        queryFn: () => recipeRepository.getByIdWithDetails(recipe.id),
+        staleTime: 5 * 60 * 1000, // 5 minutes
+      });
+    });
+  }, [recipes, queryClient]);
 
   const handleSubmitUrl = async (url: string) => {
-    if (!user) return;
+    if (!user) {
+      setCreateError("Please log in to save recipes.");
+      return;
+    }
 
-    setIsCreating(true);
     setCreateError(null);
+
     try {
       const platform = detectPlatform(url);
+      const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
-      // Direct client-side creation for immediate feedback
-      const newRecipe = await recipeRepository.create({
+      // Create recipe
+      const recipe = await recipeRepository.create({
         user_id: user.id,
         original_url: url,
         platform,
-        status: "processing", // Start as processing
+        status: "processing",
       });
 
-      // Update local state immediately
-      setRecipes((prev) => [newRecipe, ...prev]);
+      // Start processing UI simulation
+      startProcessing(recipe.id);
 
-      // Simulate processing completion after 2 seconds
-      setTimeout(async () => {
-        await recipeRepository.updateStatus(newRecipe.id, "completed");
-      }, 2000);
+      // In dev mode, simulate processing (matching Add page behavior)
+      if (isDevMode) {
+        mockDataStore.simulateRecipeProcessing(recipe.id, url);
+      }
+
+      // Refetch recipes to show the new recipe immediately
+      await refetch();
     } catch (err) {
       console.error("Failed to add recipe:", err);
-      setCreateError("Failed to save recipe. Please try again.");
-    } finally {
-      setIsCreating(false);
+      const errorMessage = err instanceof Error ? err.message : "Failed to save recipe. Please try again.";
+      setProcessingError(errorMessage);
     }
   };
 
@@ -136,7 +158,7 @@ export default function DashboardPage() {
     return (
       <AppShell
         topBar={{
-          title: "SaveIt",
+          logoSrc: "/logo.png",
           rightAction: (
             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
               <User size={24} className="text-charcoal" />
@@ -145,8 +167,8 @@ export default function DashboardPage() {
         }}
       >
         <ErrorState
-          message={error}
-          onRetry={loadData}
+          message={error instanceof Error ? error.message : "Failed to load your recipes. Please try again."}
+          onRetry={() => refetch()}
         />
       </AppShell>
     );
@@ -155,7 +177,8 @@ export default function DashboardPage() {
   return (
     <AppShell
       topBar={{
-        title: "SaveIt",
+        title: "Savory",
+        logoSrc: "/logo.png",
         rightAction: (
           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
             <User size={24} className="text-charcoal" />
@@ -174,8 +197,8 @@ export default function DashboardPage() {
           <UrlCapture
             onSubmit={handleSubmitUrl}
             variant="inline"
-            isLoading={isCreating}
             placeholder="Paste a recipe link to save..."
+            processingState={processingState}
           />
 
           {/* Create error message */}
@@ -212,50 +235,50 @@ export default function DashboardPage() {
                 Your Library
               </h3>
 
-              {/* Filter Tabs */}
-              <div className="px-4 pb-4">
-                <div className="flex gap-2">
+              {/* Combined Filter Chips */}
+              <div className="px-4 pb-4 overflow-x-auto scrollbar-hide [mask-image:linear-gradient(to_right,black_85%,transparent_100%)]">
+                <div className="flex gap-2 min-w-max">
                   <button
-                    onClick={() => setFilterView("all")}
+                    onClick={() => {
+                      setFilterView("all");
+                      setPlatformFilter("all");
+                    }}
                     className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium transition-colors",
-                      filterView === "all"
-                        ? "bg-primary text-white"
-                        : "bg-gray-100 text-charcoal hover:bg-gray-200"
+                      "px-4 py-2 rounded-full text-sm font-medium transition-colors border",
+                      filterView === "all" && platformFilter === "all"
+                        ? "bg-charcoal text-white border-charcoal"
+                        : "bg-white text-charcoal border-gray-200 hover:bg-gray-50"
                     )}
                   >
-                    All ({recipes.length})
+                    All
                   </button>
                   <button
-                    onClick={() => setFilterView("favorites")}
+                    onClick={() => setFilterView(filterView === "favorites" ? "all" : "favorites")}
                     className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5",
+                      "px-4 py-2 rounded-full text-sm font-medium transition-colors border flex items-center gap-1.5",
                       filterView === "favorites"
-                        ? "bg-accent text-white"
-                        : "bg-gray-100 text-charcoal hover:bg-gray-200"
+                        ? "bg-accent text-white border-accent"
+                        : "bg-white text-charcoal border-gray-200 hover:bg-gray-50"
                     )}
                   >
                     <Heart size={14} className={filterView === "favorites" ? "fill-current" : ""} />
                     Favorites ({favoriteCount})
                   </button>
-                </div>
-              </div>
 
-              {/* Platform Filter Chips */}
-              <div className="px-4 pb-4 overflow-x-auto scrollbar-hide">
-                <div className="flex gap-2">
-                  {(["all", "tiktok", "instagram", "youtube", "facebook"] as const).map((platform) => (
+                  <div className="w-px h-8 bg-gray-200 mx-1" />
+
+                  {(["tiktok", "instagram", "youtube", "facebook"] as const).map((platform) => (
                     <button
                       key={platform}
-                      onClick={() => setPlatformFilter(platform)}
+                      onClick={() => setPlatformFilter(platformFilter === platform ? "all" : platform)}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap",
+                        "px-4 py-2 rounded-full text-sm font-medium transition-colors border whitespace-nowrap",
                         platformFilter === platform
-                          ? "bg-charcoal text-white"
-                          : "bg-gray-100 text-muted hover:bg-gray-200"
+                          ? "bg-charcoal text-white border-charcoal"
+                          : "bg-white text-charcoal border-gray-200 hover:bg-gray-50"
                       )}
                     >
-                      {platform === "all" ? "All Platforms" : platform.charAt(0).toUpperCase() + platform.slice(1)}
+                      {platform.charAt(0).toUpperCase() + platform.slice(1)}
                       {platformCounts[platform] > 0 && ` (${platformCounts[platform]})`}
                     </button>
                   ))}
@@ -269,8 +292,8 @@ export default function DashboardPage() {
                     filterView === "favorites"
                       ? "No favorite recipes yet. Tap the heart on any recipe to add it here!"
                       : platformFilter !== "all"
-                      ? `No ${platformFilter} recipes saved yet.`
-                      : undefined
+                        ? `No ${platformFilter} recipes saved yet.`
+                        : undefined
                   }
                   emptyActionLabel={filterView === "all" && platformFilter === "all" ? "Add Recipe" : undefined}
                   emptyActionHref={filterView === "all" && platformFilter === "all" ? "/add" : undefined}

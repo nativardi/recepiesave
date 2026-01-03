@@ -1,4 +1,4 @@
-# SaveIt: Recipe Edition - UI/UX Map & User Flow Analysis
+# Savory - UI/UX Map & User Flow Analysis
 
 This map outlines the user experience for a personal recipe collection app. The focus is on clarity, appetite appeal, and utility in the kitchen.
 
@@ -94,7 +94,7 @@ This is the core value screen.
 
 ### **Flow 1: The Quick Capture**
 1.  User copies link from Instagram.
-2.  Opens SaveIt Recipe App.
+2.  Opens Savory Recipe App.
 3.  App detects link on clipboard -> "Save this recipe?" toast.
 4.  User taps "Save".
 5.  Item appears in Dashboard with "Extracting ingredients..." badge.

@@ -1,8 +1,8 @@
-# SaveIt: Recipe Edition - Product Requirements Document (PRD)
+# Savory - Product Requirements Document (PRD)
 
 ## 1. Elevator Pitch
 
-**SaveIt: Recipe Edition** is a specialized personal cookbook builder for the social media age. It solves the problem of discovering delicious recipes on TikTok, Instagram, and YouTube but losing them in the endless scroll. Unlike general bookmarking tools, this app acts as an intelligent culinary assistant: users paste a video URL, and the system automatically extracts the ingredients, cooking instructions, and key tips, turning fleeting video clips into a structured, searchable, and permanent recipe collection. It’s a "digital recipe box" that builds itself.
+**Savory** is a specialized personal cookbook builder for the social media age. It solves the problem of discovering delicious recipes on TikTok, Instagram, and YouTube but losing them in the endless scroll. Unlike general bookmarking tools, this app acts as an intelligent culinary assistant: users paste a video URL, and the system automatically extracts the ingredients, cooking instructions, and key tips, turning fleeting video clips into a structured, searchable, and permanent recipe collection. It’s a "digital recipe box" that builds itself.
 
 ## 2. Who is this app for
 
@@ -29,6 +29,10 @@
         -   Automatically detect language from transcript (Hebrew, Arabic, Chinese, Japanese, Korean, Russian, Thai, etc.)
         -   Extract recipe data in original language (no unwanted translation)
         -   Fix spelling/grammar errors while preserving language
+    -   **Content Classification:**
+        -   Pre-extraction validation: verify content is actually a recipe
+        -   Reject non-recipe content (food reviews, mukbangs, eating videos)
+        -   Early exit to save processing costs and provide clear user feedback
 - **Storage:** Store structured recipe data (JSON), public URLs, and embeddings in Supabase.
 
 ### User-Facing Features
