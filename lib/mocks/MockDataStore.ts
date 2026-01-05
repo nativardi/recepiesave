@@ -15,7 +15,7 @@ import { mockRecipes, mockIngredients, mockInstructions } from "./recipes";
 import { mockCollections, mockCollectionItems } from "./collections";
 
 const STORAGE_KEY = "saveit_mock_data";
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2; // Bumped to refresh cache with creator_name field
 
 interface MockDataStorage {
   version: number;

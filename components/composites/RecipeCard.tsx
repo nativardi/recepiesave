@@ -13,7 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Video, Timer, Heart, Utensils } from "lucide-react";
 import { memo, useCallback } from "react";
-import { RecipeCardSkeleton } from "./RecipeCardSkeleton";
+import { ProcessingRecipeCard } from "./ProcessingRecipeCard";
 
 // Generic gray placeholder for blur effect
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
@@ -68,15 +68,13 @@ function RecipeCardComponent({ recipe, className }: RecipeCardProps) {
     );
   };
 
-  if (recipe.status === "processing" || recipe.title === "Processing...") {
-    return (
-      <div className="relative w-full h-full">
-        <RecipeCardSkeleton />
-        <div className="absolute bottom-4 left-4 bg-white/90 px-2 py-1 rounded text-xs font-medium text-orange-600 shadow-sm backdrop-blur-sm z-20">
-          Extracting...
-        </div>
-      </div>
-    );
+  // Show premium processing card for pending/processing recipes
+  if (
+    recipe.status === "pending" ||
+    recipe.status === "processing" ||
+    recipe.title === "Processing..."
+  ) {
+    return <ProcessingRecipeCard className={className} />;
   }
 
   const cookTime = getCookTime();

@@ -114,7 +114,7 @@ export function UrlCapture({
                   onBlur={() => setIsFocused(false)}
                   disabled={isLoading}
                   className={cn(
-                    "flex-1 h-16 bg-transparent text-base text-charcoal placeholder:text-stone-400",
+                    "flex-1 h-16 bg-transparent text-base text-stone-800 placeholder:text-stone-400",
                     "focus:outline-none focus:placeholder:text-stone-300",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                     "transition-all duration-200"
@@ -200,7 +200,7 @@ export function UrlCapture({
               onBlur={() => setIsFocused(false)}
               placeholder={placeholder}
               disabled={isLoading}
-              className="flex-1 h-16 bg-transparent text-base text-charcoal placeholder:text-stone-400 focus:outline-none"
+              className="flex-1 h-16 bg-transparent text-base text-stone-800 placeholder:text-stone-400 focus:outline-none"
             />
           </div>
         </div>

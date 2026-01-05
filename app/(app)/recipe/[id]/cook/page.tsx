@@ -5,17 +5,16 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ProgressBar } from "@/components/primitives/ProgressBar";
 import { CookModeControls } from "@/components/composites/CookModeControls";
 import { IngredientChecklistRow } from "@/components/composites/IngredientChecklistRow";
 import { Button } from "@/components/ui/button";
 import { recipeRepository } from "@/lib/repositories/RecipeRepository";
-import { RecipeWithDetails, Ingredient } from "@/lib/types/database";
+import { RecipeWithDetails } from "@/lib/types/database";
 import {
   findIngredientsInInstruction,
   augmentInstructionWithQuantities,
-  MatchedIngredient,
 } from "@/lib/utils/ingredientMatcher";
+import { useCheckedIngredients } from "@/lib/hooks/useCheckedIngredients";
 import Image from "next/image";
 import {
   Sun,
@@ -27,6 +26,7 @@ import {
   RotateCcw,
   Check,
   ChefHat,
+  ChevronUp,
 } from "lucide-react";
 
 export default function CookModePage() {
@@ -37,9 +37,10 @@ export default function CookModePage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0); // -1 for prev, 1 for next
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(
-    new Set()
-  );
+  const [showIngredientsSheet, setShowIngredientsSheet] = useState(false);
+
+  // Shared ingredient checkbox state (syncs with recipe page)
+  const { checkedIngredients, toggleIngredient } = useCheckedIngredients(recipeId);
 
   // Timer state
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -183,20 +184,12 @@ export default function CookModePage() {
     );
   }, [currentStep, matchedIngredients]);
 
-  // Handle ingredient toggle
+  // Handle ingredient toggle - uses shared hook for sync with recipe page
   const handleIngredientToggle = useCallback(
     (ingredientId: string, checked: boolean) => {
-      setCheckedIngredients((prev) => {
-        const next = new Set(prev);
-        if (checked) {
-          next.add(ingredientId);
-        } else {
-          next.delete(ingredientId);
-        }
-        return next;
-      });
+      toggleIngredient(ingredientId, checked);
     },
-    []
+    [toggleIngredient]
   );
 
   // Loading state - MUST come after all hooks
@@ -318,8 +311,8 @@ export default function CookModePage() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col px-6 pb-6 pt-2 relative z-10 overflow-hidden">
-        {/* Progress Bar */}
-        <div className="flex flex-col gap-2 mb-4">
+        {/* Progress Section */}
+        <div className="flex flex-col gap-3 mb-6">
           <div className="flex justify-between items-end">
             <h2 className="text-2xl font-bold text-charcoal">
               Step {currentStepIndex + 1}{" "}
@@ -337,23 +330,14 @@ export default function CookModePage() {
             </motion.button>
           </div>
 
-          {/* Step indicators */}
-          <div className="flex gap-1">
-            {instructions.map((_, index) => (
-              <motion.div
-                key={index}
-                className={`h-1.5 flex-1 rounded-full ${index === currentStepIndex
-                  ? "bg-primary"
-                  : completedSteps.has(index)
-                    ? "bg-green-500"
-                    : "bg-gray-200"
-                  }`}
-                initial={false}
-                animate={{
-                  scale: index === currentStepIndex ? 1 : 0.95,
-                }}
-              />
-            ))}
+          {/* Smooth Progress Bar */}
+          <div className="h-3 w-full bg-primary/20 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-primary rounded-full"
+              initial={false}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            />
           </div>
         </div>
 
@@ -393,18 +377,13 @@ export default function CookModePage() {
                 </div>
               )}
 
-              {/* Text Content */}
+              {/* Text Content - Clean, focused on instruction */}
               <div className="p-6 flex flex-col gap-4 overflow-y-auto">
-                {/* Step Header - No longer duplicating content */}
-                <h3 className="text-lg font-bold text-primary uppercase tracking-wide">
-                  Step {currentStepIndex + 1}
-                </h3>
-
                 {/* Instruction Text with Ingredient Quantities */}
-                <p className="text-lg text-charcoal leading-relaxed">
+                <p className="text-xl text-charcoal leading-relaxed">
                   {augmentedTextSegments.map((segment, idx) =>
                     segment.isBold ? (
-                      <strong key={idx} className="text-primary font-bold">
+                      <strong key={idx} className="text-accent font-semibold">
                         {segment.text}
                       </strong>
                     ) : (
@@ -412,25 +391,6 @@ export default function CookModePage() {
                     )
                   )}
                 </p>
-
-                {/* Relevant Ingredients Checklist */}
-                {matchedIngredients.length > 0 && (
-                  <div className="mt-2 space-y-2">
-                    <p className="text-sm font-semibold text-muted uppercase tracking-wide">
-                      Ingredients for this step
-                    </p>
-                    {matchedIngredients.map(({ ingredient }) => (
-                      <IngredientChecklistRow
-                        key={ingredient.id}
-                        ingredient={ingredient}
-                        checked={checkedIngredients.has(ingredient.id)}
-                        onToggle={(checked) =>
-                          handleIngredientToggle(ingredient.id, checked)
-                        }
-                      />
-                    ))}
-                  </div>
-                )}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -446,6 +406,91 @@ export default function CookModePage() {
           canGoNext={currentStepIndex < totalSteps - 1}
         />
       </main>
+
+      {/* Ingredients Pull-Up Handle */}
+      <div className="bg-background pb-2 pt-1">
+        <motion.button
+          onClick={() => setShowIngredientsSheet(true)}
+          whileTap={{ scale: 0.98 }}
+          className="mx-auto flex flex-col items-center gap-1 w-full max-w-[200px] bg-surface px-6 py-2 rounded-t-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] border-t border-x border-gray-200"
+        >
+          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          <span className="text-xs font-semibold text-muted uppercase tracking-wide flex items-center gap-1">
+            <ChevronUp size={14} />
+            Ingredients
+          </span>
+        </motion.button>
+      </div>
+
+      {/* Ingredients Sheet Modal */}
+      <AnimatePresence>
+        {showIngredientsSheet && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={() => setShowIngredientsSheet(false)}
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(_, info) => {
+                if (info.offset.y > 100) {
+                  setShowIngredientsSheet(false);
+                }
+              }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-3xl shadow-xl max-w-md mx-auto max-h-[70vh] flex flex-col"
+            >
+              {/* Drag Handle */}
+              <div className="flex justify-center py-3 cursor-grab active:cursor-grabbing">
+                <div className="w-10 h-1 bg-gray-300 rounded-full" />
+              </div>
+
+              {/* Header */}
+              <div className="px-6 pb-4 border-b border-gray-100">
+                <h3 className="text-xl font-bold text-charcoal text-center">
+                  Ingredients
+                </h3>
+                <p className="text-sm text-muted text-center mt-1">
+                  {recipe.ingredients.length} items
+                </p>
+              </div>
+
+              {/* Ingredients List */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+                {recipe.ingredients.map((ingredient) => (
+                  <IngredientChecklistRow
+                    key={ingredient.id}
+                    ingredient={ingredient}
+                    checked={checkedIngredients.has(ingredient.id)}
+                    onToggle={(checked) =>
+                      handleIngredientToggle(ingredient.id, checked)
+                    }
+                  />
+                ))}
+              </div>
+
+              {/* Close Button */}
+              <div className="p-4 border-t border-gray-100">
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => setShowIngredientsSheet(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Timer Picker Modal */}
       <AnimatePresence>

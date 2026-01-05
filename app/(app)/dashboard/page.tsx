@@ -42,9 +42,14 @@ export default function DashboardPage() {
 
   // Processing state management
   const { processingState, startProcessing, setError: setProcessingError } = useRecipeProcessing({
-    onComplete: () => {
+    onComplete: async () => {
       // Refetch recipes when processing completes
-      refetch();
+      await refetch();
+
+      // Refetch again after a short delay to ensure MockDataStore updates are visible
+      setTimeout(() => {
+        refetch();
+      }, 500);
     },
     onError: (error) => {
       setCreateError(error);
@@ -79,6 +84,25 @@ export default function DashboardPage() {
     });
   }, [recipes, queryClient]);
 
+  // Clean up stuck processing recipes on mount (dev mode only)
+  useEffect(() => {
+    const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+    if (!isDevMode || !recipes || recipes.length === 0) return;
+
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+
+    recipes.forEach((recipe) => {
+      // If recipe is stuck in pending/processing and was created more than 5 minutes ago, mark as failed
+      if (
+        (recipe.status === "pending" || recipe.status === "processing") &&
+        new Date(recipe.created_at).getTime() < fiveMinutesAgo
+      ) {
+        console.warn(`Cleaning up stuck recipe: ${recipe.id}`);
+        mockDataStore.updateRecipeStatus(recipe.id, "failed");
+      }
+    });
+  }, [recipes]);
+
   const handleSubmitUrl = async (url: string) => {
     if (!user) {
       setCreateError("Please log in to save recipes.");
@@ -91,12 +115,12 @@ export default function DashboardPage() {
       const platform = detectPlatform(url);
       const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
-      // Create recipe
+      // Create recipe (use "pending" - valid database status value)
       const recipe = await recipeRepository.create({
         user_id: user.id,
         original_url: url,
         platform,
-        status: "processing",
+        status: "pending",
       });
 
       // Start processing UI simulation
@@ -104,10 +128,11 @@ export default function DashboardPage() {
 
       // In dev mode, simulate processing (matching Add page behavior)
       if (isDevMode) {
+        // Run simulation in background - will trigger refetch via onComplete
         mockDataStore.simulateRecipeProcessing(recipe.id, url);
       }
 
-      // Refetch recipes to show the new recipe immediately
+      // Refetch recipes to show the new pending recipe immediately
       await refetch();
     } catch (err) {
       console.error("Failed to add recipe:", err);
@@ -246,8 +271,8 @@ export default function DashboardPage() {
                     className={cn(
                       "px-4 py-2 rounded-full text-sm font-medium transition-colors border",
                       filterView === "all" && platformFilter === "all"
-                        ? "bg-charcoal text-white border-charcoal"
-                        : "bg-white text-charcoal border-gray-200 hover:bg-gray-50"
+                        ? "bg-primary text-white border-primary"
+                        : "bg-surface text-charcoal border-muted/30 hover:bg-surface/80"
                     )}
                   >
                     All
@@ -258,7 +283,7 @@ export default function DashboardPage() {
                       "px-4 py-2 rounded-full text-sm font-medium transition-colors border flex items-center gap-1.5",
                       filterView === "favorites"
                         ? "bg-accent text-white border-accent"
-                        : "bg-white text-charcoal border-gray-200 hover:bg-gray-50"
+                        : "bg-surface text-charcoal border-muted/30 hover:bg-surface/80"
                     )}
                   >
                     <Heart size={14} className={filterView === "favorites" ? "fill-current" : ""} />
@@ -274,8 +299,8 @@ export default function DashboardPage() {
                       className={cn(
                         "px-4 py-2 rounded-full text-sm font-medium transition-colors border whitespace-nowrap",
                         platformFilter === platform
-                          ? "bg-charcoal text-white border-charcoal"
-                          : "bg-white text-charcoal border-gray-200 hover:bg-gray-50"
+                          ? "bg-primary text-white border-primary"
+                          : "bg-surface text-charcoal border-muted/30 hover:bg-surface/80"
                       )}
                     >
                       {platform.charAt(0).toUpperCase() + platform.slice(1)}

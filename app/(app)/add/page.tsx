@@ -8,7 +8,8 @@ import { UserCircle } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ProcessingCard } from "@/components/composites/ProcessingCard";
+import { ProcessingIndicator } from "@/components/composites/ProcessingIndicator";
+import { useRecipeProcessing } from "@/lib/hooks/useRecipeProcessing";
 import { getCurrentUser } from "@/lib/auth/get-user";
 import { RecipeRepository } from "@/lib/repositories/RecipeRepository";
 import { mockDataStore } from "@/lib/mocks/MockDataStore";
@@ -20,7 +21,14 @@ export default function AddRecipePage() {
   const [urlInput, setUrlInput] = useState("");
   const [pageState, setPageState] = useState<PageState>("input");
   const [errorMessage, setErrorMessage] = useState("");
-  const [progress, setProgress] = useState(0);
+
+  // Use the new processing hook
+  const { processingState, startProcessing } = useRecipeProcessing({
+    onComplete: () => {
+      // Navigate to dashboard when processing completes
+      router.push("/dashboard");
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +40,6 @@ export default function AddRecipePage() {
     }
 
     setPageState("processing");
-    setProgress(0);
-
-    let progressInterval: NodeJS.Timeout | null = null;
-    let navigationTimeout: NodeJS.Timeout | null = null;
     const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
     try {
@@ -71,26 +75,11 @@ export default function AddRecipePage() {
           platform,
         });
 
+        // Start the premium processing UI
+        startProcessing(recipe.id);
+
         // Start simulated processing asynchronously
         mockDataStore.simulateRecipeProcessing(recipe.id, urlInput.trim());
-
-        // Simulate progress UI
-        progressInterval = setInterval(() => {
-          setProgress((prev) => {
-            if (prev >= 90) {
-              if (progressInterval) clearInterval(progressInterval);
-              return 90;
-            }
-            return prev + 10;
-          });
-        }, 500);
-
-        // Navigate after simulated processing completes (~4 seconds)
-        navigationTimeout = setTimeout(() => {
-          if (progressInterval) clearInterval(progressInterval);
-          setProgress(100);
-          router.push("/dashboard");
-        }, 4500);
 
         return;
       }
@@ -113,43 +102,28 @@ export default function AddRecipePage() {
         return;
       }
 
-      // Simulate progress
-      progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) {
-            if (progressInterval) clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 500);
+      // Start the premium processing UI for production too
+      startProcessing(data.recipe_id || "prod-recipe");
 
-      // Wait a bit then navigate to dashboard
-      navigationTimeout = setTimeout(() => {
-        if (progressInterval) clearInterval(progressInterval);
-        setProgress(100);
-        router.push("/dashboard");
-      }, 3000);
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage("Something went wrong. Please try again.");
       setPageState("error");
-      // Cleanup intervals on error
-      if (progressInterval) clearInterval(progressInterval);
-      if (navigationTimeout) clearTimeout(navigationTimeout);
     }
   };
 
   const handleRetry = () => {
     setPageState("input");
     setErrorMessage("");
-    setProgress(0);
   };
 
+  // Show processing UI when in processing state
   if (pageState === "processing") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <ProcessingCard progress={progress} />
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <ProcessingIndicator processingState={processingState} />
+        </div>
       </div>
     );
   }

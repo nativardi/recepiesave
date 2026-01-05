@@ -15,6 +15,7 @@ import { ErrorState } from "@/components/composites/ErrorState";
 import { useRecipeDetail } from "@/lib/hooks/useRecipeDetail";
 import { useToggleFavorite } from "@/lib/hooks/useToggleFavorite";
 import { useDeleteRecipe } from "@/lib/hooks/useDeleteRecipe";
+import { useCheckedIngredients } from "@/lib/hooks/useCheckedIngredients";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils/cn";
 import Image from "next/image";
@@ -57,9 +58,7 @@ export default function RecipeDetailPage() {
   const recipeId = params.id as string;
   const { data: recipe, isLoading, error, refetch } = useRecipeDetail(recipeId);
   const [activeTab, setActiveTab] = useState("ingredients");
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(
-    new Set()
-  );
+  const { checkedIngredients, toggleIngredient } = useCheckedIngredients(recipeId);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const toggleFavorite = useToggleFavorite();
@@ -134,15 +133,7 @@ export default function RecipeDetailPage() {
   }
 
   const handleIngredientToggle = (ingredientId: string, checked: boolean) => {
-    setCheckedIngredients((prev) => {
-      const next = new Set(prev);
-      if (checked) {
-        next.add(ingredientId);
-      } else {
-        next.delete(ingredientId);
-      }
-      return next;
-    });
+    toggleIngredient(ingredientId, checked);
   };
 
   const handleStartCooking = () => {

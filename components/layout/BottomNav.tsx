@@ -25,6 +25,12 @@ interface NavItem {
 export function BottomNav() {
   const pathname = usePathname();
 
+  // Hide bottom nav in cook mode for distraction-free cooking
+  const isCookMode = pathname?.includes("/cook");
+  if (isCookMode) {
+    return null;
+  }
+
   // All 5 nav items including Add in the center
   const allNavItems = [
     { href: "/dashboard", label: "Home", icon: Home },
@@ -89,16 +95,15 @@ export function BottomNav() {
                           ? "h-6 w-6 text-white"
                           : isActive
                             ? "h-6 w-6 text-primary"
-                            : "h-6 w-6 text-stone-600"
+                            : "h-6 w-6 text-muted"
                       )}
                     />
                   </div>
 
-                  {/* Label - always visible */}
                   <span
                     className={cn(
                       "text-[10px] font-medium transition-colors duration-300",
-                      isActive ? "text-primary" : "text-stone-600"
+                      isActive ? "text-primary" : "text-muted"
                     )}
                   >
                     {item.label}
